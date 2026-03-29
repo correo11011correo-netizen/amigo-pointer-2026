@@ -2,85 +2,228 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Amigo-Pointer 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Amigo-Pointer 2026 | Adaptive</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --accent: #4ade80; --bg: #ffffff; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        :root { 
+            --accent: #4ade80; 
+            --bg: #ffffff; 
+            --text: #111111;
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+        }
         
-        /* Pantalla de Inicio */
-        #setup { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
-        .btn { background: #000; color: #fff; border: none; padding: 18px 30px; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; font-size: 18px; letter-spacing: 1px; }
-        input { width: 100%; padding: 18px; margin: 10px 0; border: 3px solid #f0f0f0; border-radius: 15px; font-size: 24px; text-align: center; box-sizing: border-box; font-weight: bold; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* Pantalla de la Brújula */
-        #app { display: none; text-align: center; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
-        .header { position: absolute; top: 40px; width: 100%; z-index: 10; }
-        .room-tag { background: #000; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 22px; font-weight: 900; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            height: 100vh; 
+            height: 100dvh; /* Dynamic viewport height para móviles */
+            overflow: hidden; 
+        }
+
+        /* Pantalla de Inicio - Adaptativa */
+        #setup { 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%; 
+            max-width: 500px; 
+            padding: 40px 10%;
+            height: 100%;
+        }
+
+        h1 { font-size: clamp(28px, 8vw, 42px); margin: 0; font-weight: 900; letter-spacing: -1px; text-align: center; }
+        .subtitle { color: #888; font-size: 14px; letter-spacing: 3px; margin-bottom: 40px; text-align: center; font-weight: 600; }
+
+        .btn { 
+            background: #000; 
+            color: #fff; 
+            border: none; 
+            padding: 20px; 
+            border-radius: 18px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 18px; 
+            transition: transform 0.1s, opacity 0.1s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
         
-        .compass-container { position: relative; width: 300px; height: 300px; border: 6px solid var(--accent); border-radius: 50%; margin: 40px auto; display: flex; align-items: center; justify-content: center; background: #fafafa; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        #arrow { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 70px solid var(--accent); transition: transform 0.1s ease-out; }
+        input { 
+            width: 100%; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border: 3px solid #f5f5f5; 
+            border-radius: 18px; 
+            font-size: 26px; 
+            text-align: center; 
+            background: #fafafa;
+            font-weight: 900;
+            color: #000;
+        }
+
+        /* Pantalla de la Brújula - Adaptativa */
+        #app { 
+            display: none; 
+            flex-direction: column;
+            width: 100%; 
+            height: 100%; 
+            padding: var(--safe-top) 20px var(--safe-bottom);
+        }
+
+        .header { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 20px;
+        }
+
+        .room-tag { 
+            background: #000; 
+            color: #fff; 
+            padding: 10px 25px; 
+            border-radius: 30px; 
+            font-size: clamp(18px, 5vw, 24px); 
+            font-weight: 900; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
         
-        #dist { font-size: 64px; font-weight: 900; color: #000; margin-top: 10px; }
-        #status { font-size: 16px; color: #888; letter-spacing: 3px; text-transform: uppercase; font-weight: bold; }
+        .main-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .compass-outer { 
+            position: relative; 
+            width: clamp(250px, 70vmin, 400px); 
+            height: clamp(250px, 70vmin, 400px); 
+            border: 8px solid var(--accent); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: radial-gradient(circle, #ffffff 0%, #f7f7f7 100%); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            transition: border-color 0.3s ease;
+        }
+
+        #arrow { 
+            width: 0; 
+            height: 0; 
+            border-left: clamp(15px, 4vmin, 25px) solid transparent; 
+            border-right: clamp(15px, 4vmin, 25px) solid transparent; 
+            border-bottom: clamp(50px, 12vmin, 80px) solid var(--accent); 
+            transition: transform 0.15s cubic-bezier(0.1, 0.5, 0.5, 1), border-bottom-color 0.3s; 
+        }
+
+        .center-pin {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #222;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
         
-        .exit-btn { position: absolute; bottom: 40px; color: #ff4444; font-weight: bold; text-decoration: none; cursor: pointer; border: 2px solid #ff4444; padding: 10px 25px; border-radius: 12px; }
+        .info-panel {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #dist { 
+            font-size: clamp(50px, 15vw, 85px); 
+            font-weight: 900; 
+            line-height: 1;
+            margin: 10px 0;
+            letter-spacing: -2px;
+        }
+        #status { font-size: 14px; color: #aaa; letter-spacing: 4px; font-weight: 800; }
+        
+        .footer {
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .exit-btn { 
+            color: #ff4444; 
+            font-weight: 800; 
+            font-size: 14px;
+            letter-spacing: 1px;
+            padding: 12px 30px;
+            border-radius: 12px;
+            border: 2px solid #ff4444;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE INICIO: CREAR O UNIRSE -->
     <div id="setup">
-        <h1 style="font-size: 38px; margin-bottom: 5px;">🦅 AMIGO-POINTER</h1>
-        <p style="color: #888; margin-bottom: 50px; letter-spacing: 2px;">LOCALIZADOR ATÓMICO 2026</p>
+        <h1>🦅 AMIGO-POINTER</h1>
+        <div class="subtitle">LOCALIZADOR ATÓMICO 2026</div>
         
-        <button class="btn" onclick="createRoom()">CREAR NUEVA SALA</button>
+        <button class="btn" onclick="createRoom()">NUEVA SALA</button>
         
-        <div style="display: flex; align-items: center; margin: 40px 0;">
-            <div style="flex:1; height:1px; background:#eee;"></div>
-            <span style="padding: 0 15px; color:#ccc; font-weight:bold;">O</span>
-            <div style="flex:1; height:1px; background:#eee;"></div>
+        <div style="width:100%; display: flex; align-items: center; margin: 30px 0;">
+            <div style="flex:1; height:2px; background:#f0f0f0;"></div>
+            <span style="padding: 0 15px; color:#ddd; font-weight:bold;">O</span>
+            <div style="flex:1; height:2px; background:#f0f0f0;"></div>
         </div>
         
-        <input type="number" id="roomCode" placeholder="CÓDIGO DEL AMIGO" maxlength="4">
-        <button class="btn" style="background: #333;" onclick="joinRoom()">CONECTAR CON AMIGO</button>
+        <input type="number" id="roomCode" placeholder="CÓDIGO AMIGO" pattern="\d*">
+        <button class="btn" style="background: #333;" onclick="joinRoom()">CONECTAR</button>
     </div>
 
-    <!-- PANTALLA DE LA BRÚJULA ACTIVA -->
     <div id="app">
         <div class="header">
-            <span class="room-tag" id="roomDisplay">SALA: ----</span><br>
-            <p id="roleDisplay" style="margin-top: 10px; color: #888; font-weight: bold; letter-spacing: 1px;"></p>
+            <span class="room-tag" id="roomDisplay">SALA: ----</span>
+            <div id="roleDisplay" style="margin-top: 12px; font-size: 12px; font-weight: bold; color: #888; letter-spacing: 1px;">VINCULANDO...</div>
         </div>
         
-        <div class="compass-container">
-            <div id="arrow"></div>
-            <div style="position: absolute; width: 15px; height: 15px; background: #333; border-radius: 50%;"></div>
+        <div class="main-view">
+            <div class="compass-outer">
+                <div id="arrow"></div>
+                <div class="center-pin"></div>
+            </div>
+            
+            <div class="info-panel">
+                <div id="dist">--m</div>
+                <div id="status">UBICANDO...</div>
+            </div>
         </div>
         
-        <div id="dist">--m</div>
-        <div id="status">ESPERANDO SEÑAL...</div>
-        
-        <div class="exit-btn" onclick="location.reload()">TERMINAR SESIÓN</div>
+        <div class="footer">
+            <div class="exit-btn" onclick="location.reload()">CERRAR SESIÓN</div>
+        </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE
-        const firebaseConfig = {
-            databaseURL: "https://amigo-pointer-default-rtdb.firebaseio.com"
-        };
+        // CONFIG
+        const firebaseConfig = { databaseURL: "https://amigo-pointer-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let sessionId = "";
-        let myId = "";
-        let myLoc = null;
-        let friendLoc = null;
-        let heading = 0;
+        let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
-        // SENSORES: Magnetómetro (Brújula) y Acelerómetro
+        // SENSORES
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientationabsolute', (e) => {
                 heading = e.alpha || e.webkitCompassHeading || 0;
@@ -88,33 +231,24 @@
             }, true);
         }
 
-        // GPS: Seguimiento en tiempo real
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
             if (sessionId) syncLoc();
             updateUI();
-        }, (err) => {
-            console.error("GPS Error:", err);
-            alert("⚠️ Por favor activa el GPS de alta precisión.");
-        }, { enableHighAccuracy: true });
+        }, null, { enableHighAccuracy: true });
 
-        // FUNCIÓN: CREAR SALA (Genera código para el amigo)
+        // SALAS
         function createRoom() {
-            // Genera código aleatorio de 4 dígitos
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
-            myId = "u1"; // Creador es Usuario 1
-            
-            // Inicializar sala en Firebase para que el amigo la encuentre
+            myId = "u1";
             db.ref('sessions/' + sessionId).set({ created: Date.now() });
-            
             startSession();
         }
 
-        // FUNCIÓN: UNIRSE A SALA (Ingresa código del creador)
         function joinRoom() {
             sessionId = document.getElementById('roomCode').value;
-            if (sessionId.length !== 4) return alert("❌ El código debe ser de 4 dígitos.");
-            myId = "u2"; // El que se une es Usuario 2
+            if (sessionId.length < 4) return;
+            myId = "u2";
             startSession();
         }
 
@@ -122,55 +256,35 @@
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
             document.getElementById('roomDisplay').innerText = "CÓDIGO: " + sessionId;
-            document.getElementById('roleDisplay').innerText = myId === "u1" ? "TU AMIGO DEBE USAR ESTE CÓDIGO" : "CONECTADO CON TU AMIGO";
             
-            // Escuchar posición del amigo
             const friendId = myId === "u1" ? "u2" : "u1";
             db.ref('sessions/' + sessionId + '/' + friendId).on('value', (snap) => {
                 friendLoc = snap.val();
-                if (friendLoc) {
-                    document.getElementById('roleDisplay').innerText = "VINCULACIÓN EXITOSA";
-                }
+                if (friendLoc) document.getElementById('roleDisplay').innerText = "CONEXIÓN ESTABLE";
                 updateUI();
             });
         }
 
-        function syncLoc() {
-            if (myLoc) {
-                db.ref('sessions/' + sessionId + '/' + myId).set(myLoc);
-            }
-        }
+        function syncLoc() { if (myLoc) db.ref('sessions/' + sessionId + '/' + myId).set(myLoc); }
 
-        // CÁLCULOS: Brújula y Distancia
+        // CÁLCULOS
         function updateUI() {
             if (!myLoc || !friendLoc) return;
-
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
-            
-            // La rotación es el Rumbo relativo a mi orientación actual
             const angle = (bearing - heading + 360) % 360;
             
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
+            document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
             
-            // Formateo de distancia (m o km)
-            if (dist < 1) {
-                document.getElementById('dist').innerText = (dist * 1000).toFixed(0) + "m";
-            } else {
-                document.getElementById('dist').innerText = dist.toFixed(2) + "km";
-            }
-            
-            // Cambio dinámico de colores
             const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#facc15" : "#f87171");
             document.documentElement.style.setProperty('--accent', color);
-            
-            document.getElementById('status').innerText = dist < 0.03 ? "¡LLEGASTE!" : "SIGUE LA FLECHA";
+            document.getElementById('status').innerText = dist < 0.03 ? "¡OBJETIVO A LA VISTA!" : "SIGUE EL RUMBO";
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radio Tierra en km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
