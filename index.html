@@ -46,7 +46,6 @@
             display: flex; align-items: center; justify-content: center;
         }
         
-        /* Círculos de Distancia */
         .radar-frame::before { content: ''; position: absolute; width: 66%; height: 66%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
         .radar-frame::after { content: ''; position: absolute; width: 33%; height: 33%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
 
@@ -58,6 +57,13 @@
         .dist-box { text-align: center; margin-top: 20px; }
         .dist-val { font-size: 60px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
         .dist-label { font-size: 12px; letter-spacing: 3px; color: #555; font-weight: 800; }
+
+        /* INDICADOR GPS VISUAL */
+        .gps-status-indicator {
+            position: absolute; top: var(--safe-top); right: 20px;
+            font-size: 10px; font-weight: 900; letter-spacing: 1px; color: #444;
+        }
+        .gps-active { color: #4ade80 !important; text-shadow: 0 0 10px #4ade80; }
 
         /* --- [ZONA PROTEGIDA: SISTEMA DE DIAGNÓSTICO] --- */
         #black-box { 
@@ -80,8 +86,10 @@
     </div>
 
     <div id="app">
+        <div class="gps-status-indicator" id="gpsVisual">🛰️ GPS: OFF</div>
+
         <div class="radar-view">
-            <div style="position: absolute; top: var(--safe-top); font-weight: 900; opacity: 0.3; letter-spacing: 2px;" id="roomDisplay">SALA: ----</div>
+            <div style="position: absolute; top: var(--safe-top); left: 20px; font-weight: 900; opacity: 0.3; letter-spacing: 2px; font-size: 12px;" id="roomDisplay">SALA: ----</div>
             
             <div class="radar-frame">
                 <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
@@ -90,11 +98,10 @@
 
             <div class="dist-box">
                 <div class="dist-val" id="dist">--</div>
-                <div class="dist-label" id="unit">BUSCANDO SEÑAL...</div>
+                <div class="dist-label" id="unit">VINCULANDO...</div>
             </div>
         </div>
 
-        <!-- [SISTEMA DE DIAGNÓSTICO - NO EDITAR LÓGICA] -->
         <div id="black-box">
             <div class="bb-header">
                 <span>RAW TRAFFIC MONITOR (BLACK BOX)</span>
@@ -110,7 +117,6 @@
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
-        // --- FUNCIÓN DE LOGS (PROTEGIDA) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
             const time = new Date().toLocaleTimeString();
@@ -121,19 +127,21 @@
             console.scrollTop = console.scrollHeight;
         }
 
-        // GPS
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+            document.getElementById('gpsVisual').innerText = "🛰️ GPS: ACTIVE";
+            document.getElementById('gpsVisual').classList.add('gps-active');
             if(!sessionId) addLog("GPS_FIX_ESTABLISHED", myLoc);
-        }, (err) => addLog("GPS_ERROR", err.message), { enableHighAccuracy: true });
+        }, (err) => {
+            document.getElementById('gpsVisual').innerText = "🛰️ GPS: ERROR";
+            addLog("GPS_ERROR", err.message);
+        }, { enableHighAccuracy: true });
 
-        // SENSORES
         window.addEventListener('deviceorientationabsolute', (e) => {
             heading = e.alpha || e.webkitCompassHeading || 0;
             if(sessionId && friendLoc) updateUI();
         }, true);
 
-        // MOTOR SYNC
         function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
