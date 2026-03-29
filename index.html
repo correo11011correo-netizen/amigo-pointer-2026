@@ -9,48 +9,65 @@
     <style>
         :root { --accent: #4ade80; --bg: #ffffff; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #setup { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
-        .btn { background: #000; color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; font-size: 16px; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; font-size: 20px; text-align: center; box-sizing: border-box; }
         
-        #app { display: none; text-align: center; width: 100%; }
-        .compass-container { position: relative; width: 280px; height: 280px; border: 4px solid var(--accent); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #f9f9f9; }
-        #arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 60px solid var(--accent); transition: transform 0.1s ease-out; }
-        #dist { font-size: 48px; font-weight: 900; margin-top: 20px; color: #000; }
-        #status { font-size: 14px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
-        .header { position: absolute; top: 40px; width: 100%; }
+        /* Pantalla de Inicio */
+        #setup { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
+        .btn { background: #000; color: #fff; border: none; padding: 18px 30px; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; font-size: 18px; letter-spacing: 1px; }
+        input { width: 100%; padding: 18px; margin: 10px 0; border: 3px solid #f0f0f0; border-radius: 15px; font-size: 24px; text-align: center; box-sizing: border-box; font-weight: bold; }
+        
+        /* Pantalla de la Brújula */
+        #app { display: none; text-align: center; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        .header { position: absolute; top: 40px; width: 100%; z-index: 10; }
+        .room-tag { background: #000; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 22px; font-weight: 900; }
+        
+        .compass-container { position: relative; width: 300px; height: 300px; border: 6px solid var(--accent); border-radius: 50%; margin: 40px auto; display: flex; align-items: center; justify-content: center; background: #fafafa; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #arrow { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 70px solid var(--accent); transition: transform 0.1s ease-out; }
+        
+        #dist { font-size: 64px; font-weight: 900; color: #000; margin-top: 10px; }
+        #status { font-size: 16px; color: #888; letter-spacing: 3px; text-transform: uppercase; font-weight: bold; }
+        
+        .exit-btn { position: absolute; bottom: 40px; color: #ff4444; font-weight: bold; text-decoration: none; cursor: pointer; border: 2px solid #ff4444; padding: 10px 25px; border-radius: 12px; }
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA DE INICIO: CREAR O UNIRSE -->
     <div id="setup">
-        <h1>🦅 AMIGO-POINTER</h1>
-        <p>EDICIÓN 2026</p>
-        <button class="btn" onclick="createRoom()">CREAR SALA</button>
-        <div style="margin: 30px 0; height: 1px; background: #eee;"></div>
-        <input type="number" id="roomCode" placeholder="CÓDIGO DE 4 DÍGITOS">
-        <button class="btn" style="background: #333;" onclick="joinRoom()">UNIRSE A AMIGO</button>
+        <h1 style="font-size: 38px; margin-bottom: 5px;">🦅 AMIGO-POINTER</h1>
+        <p style="color: #888; margin-bottom: 50px; letter-spacing: 2px;">LOCALIZADOR ATÓMICO 2026</p>
+        
+        <button class="btn" onclick="createRoom()">CREAR NUEVA SALA</button>
+        
+        <div style="display: flex; align-items: center; margin: 40px 0;">
+            <div style="flex:1; height:1px; background:#eee;"></div>
+            <span style="padding: 0 15px; color:#ccc; font-weight:bold;">O</span>
+            <div style="flex:1; height:1px; background:#eee;"></div>
+        </div>
+        
+        <input type="number" id="roomCode" placeholder="CÓDIGO DEL AMIGO" maxlength="4">
+        <button class="btn" style="background: #333;" onclick="joinRoom()">CONECTAR CON AMIGO</button>
     </div>
 
+    <!-- PANTALLA DE LA BRÚJULA ACTIVA -->
     <div id="app">
         <div class="header">
-            <b id="roomDisplay">SALA: ----</b><br>
-            <small id="roleDisplay">BUSCANDO...</small>
+            <span class="room-tag" id="roomDisplay">SALA: ----</span><br>
+            <p id="roleDisplay" style="margin-top: 10px; color: #888; font-weight: bold; letter-spacing: 1px;"></p>
         </div>
         
         <div class="compass-container">
             <div id="arrow"></div>
+            <div style="position: absolute; width: 15px; height: 15px; background: #333; border-radius: 50%;"></div>
         </div>
         
         <div id="dist">--m</div>
-        <div id="status">UBICANDO AMIGO...</div>
+        <div id="status">ESPERANDO SEÑAL...</div>
         
-        <button onclick="location.reload()" style="margin-top: 50px; background: none; border: none; color: red; cursor: pointer;">SALIR</button>
+        <div class="exit-btn" onclick="location.reload()">TERMINAR SESIÓN</div>
     </div>
 
     <script>
-        // CONFIGURACIÓN PÚBLICA DE FIREBASE (DEMO)
-        // Nota: Para uso real, el usuario debería poner su propia config aquí.
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             databaseURL: "https://amigo-pointer-default-rtdb.firebaseio.com"
         };
@@ -63,7 +80,7 @@
         let friendLoc = null;
         let heading = 0;
 
-        // --- LÓGICA DE SENSORES ---
+        // SENSORES: Magnetómetro (Brújula) y Acelerómetro
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientationabsolute', (e) => {
                 heading = e.alpha || e.webkitCompassHeading || 0;
@@ -71,63 +88,87 @@
             }, true);
         }
 
+        // GPS: Seguimiento en tiempo real
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
             if (sessionId) syncLoc();
             updateUI();
-        }, (err) => alert("Activa el GPS para funcionar"), { enableHighAccuracy: true });
+        }, (err) => {
+            console.error("GPS Error:", err);
+            alert("⚠️ Por favor activa el GPS de alta precisión.");
+        }, { enableHighAccuracy: true });
 
-        // --- LÓGICA DE SALAS ---
+        // FUNCIÓN: CREAR SALA (Genera código para el amigo)
         function createRoom() {
+            // Genera código aleatorio de 4 dígitos
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
-            myId = "u1";
+            myId = "u1"; // Creador es Usuario 1
+            
+            // Inicializar sala en Firebase para que el amigo la encuentre
+            db.ref('sessions/' + sessionId).set({ created: Date.now() });
+            
             startSession();
         }
 
+        // FUNCIÓN: UNIRSE A SALA (Ingresa código del creador)
         function joinRoom() {
             sessionId = document.getElementById('roomCode').value;
-            if (sessionId.length !== 4) return alert("Código inválido");
-            myId = "u2";
+            if (sessionId.length !== 4) return alert("❌ El código debe ser de 4 dígitos.");
+            myId = "u2"; // El que se une es Usuario 2
             startSession();
         }
 
         function startSession() {
             document.getElementById('setup').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            document.getElementById('roomDisplay').innerText = "SALA: " + sessionId;
-            document.getElementById('roleDisplay').innerText = myId === "u1" ? "LÍDER" : "SEGUIDOR";
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('roomDisplay').innerText = "CÓDIGO: " + sessionId;
+            document.getElementById('roleDisplay').innerText = myId === "u1" ? "TU AMIGO DEBE USAR ESTE CÓDIGO" : "CONECTADO CON TU AMIGO";
             
+            // Escuchar posición del amigo
             const friendId = myId === "u1" ? "u2" : "u1";
             db.ref('sessions/' + sessionId + '/' + friendId).on('value', (snap) => {
                 friendLoc = snap.val();
+                if (friendLoc) {
+                    document.getElementById('roleDisplay').innerText = "VINCULACIÓN EXITOSA";
+                }
                 updateUI();
             });
         }
 
         function syncLoc() {
-            db.ref('sessions/' + sessionId + '/' + myId).set(myLoc);
+            if (myLoc) {
+                db.ref('sessions/' + sessionId + '/' + myId).set(myLoc);
+            }
         }
 
-        // --- CÁLCULOS GEOGRÁFICOS ---
+        // CÁLCULOS: Brújula y Distancia
         function updateUI() {
             if (!myLoc || !friendLoc) return;
 
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             
-            // Ángulo final = Rumbo al amigo - Mi orientación actual
+            // La rotación es el Rumbo relativo a mi orientación actual
             const angle = (bearing - heading + 360) % 360;
             
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
-            document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
             
-            const color = dist < 0.05 ? "#4ade80" : (dist < 0.5 ? "#facc15" : "#f87171");
+            // Formateo de distancia (m o km)
+            if (dist < 1) {
+                document.getElementById('dist').innerText = (dist * 1000).toFixed(0) + "m";
+            } else {
+                document.getElementById('dist').innerText = dist.toFixed(2) + "km";
+            }
+            
+            // Cambio dinámico de colores
+            const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#facc15" : "#f87171");
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('status').innerText = dist < 0.05 ? "¡ESTÁ AQUÍ!" : "SIGUE LA FLECHA";
+            
+            document.getElementById('status').innerText = dist < 0.03 ? "¡LLEGASTE!" : "SIGUE LA FLECHA";
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
+            const R = 6371; // Radio Tierra en km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
