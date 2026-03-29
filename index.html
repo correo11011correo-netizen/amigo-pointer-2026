@@ -3,158 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Tactical Precision</title>
+    <title>Amigo-Pointer 2026 | Party Edition</title>
     <style>
         :root { 
-            --accent: #4285F4; 
-            --bg: #000000; 
-            --nav-bg: #0a0a0a;
+            --accent: #ff00ff; /* Magenta Neón */
+            --bg: #0f051a; /* Púrpura profundo */
             --text: #ffffff;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             background: var(--bg); color: var(--text);
             overflow: hidden; 
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* --- LOGO TÁCTICO (Retícula en lugar de Águila) --- */
-        .reticle {
-            width: 40px; height: 40px; border: 2px solid var(--accent); border-radius: 50%;
-            position: relative; margin-bottom: 20px;
-        }
-        .reticle::before, .reticle::after {
-            content: ''; position: absolute; background: var(--accent);
-        }
-        .reticle::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
-        .reticle::after { width: 2px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+        /* --- LOGO PARTY --- */
+        .party-icon { font-size: 40px; margin-bottom: 20px; text-shadow: 0 0 20px var(--accent); }
 
         /* --- PANTALLA DE INICIO --- */
         #setup { 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             width: 100%; height: 100dvh; padding: 0 10%; text-align: center;
+            background: radial-gradient(circle at top, #2a0a4a 0%, #0f051a 100%);
         }
 
-        .logo-area { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
-        .logo-area h1 { font-size: 30px; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
-        .logo-area p { color: #555; font-size: 10px; font-weight: 800; letter-spacing: 6px; margin: 5px 0 0; text-transform: uppercase; }
+        h1 { font-size: 34px; font-weight: 900; letter-spacing: -1px; margin: 0; color: #fff; text-shadow: 0 0 15px rgba(255,0,255,0.5); }
+        .party-tag { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: 3px; margin-top: 5px; }
 
         .setup-card {
-            background: #080808; border: 1px solid #111; padding: 40px 30px; border-radius: 24px;
-            width: 100%; max-width: 400px;
+            margin-top: 40px; width: 100%; max-width: 400px;
         }
 
-        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn:active { transform: scale(0.97); }
-        .btn-link { background: transparent; border: 1px solid #222; color: #666; margin-top: 15px; font-size: 12px; }
+        .btn { 
+            background: var(--accent); color: #fff; border: none; padding: 20px; border-radius: 20px; 
+            font-weight: 900; cursor: pointer; width: 100%; font-size: 16px; 
+            box-shadow: 0 10px 30px rgba(255,0,255,0.3); transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-join { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.1); color: #fff; margin-top: 15px; box-shadow: none; }
 
-        .code-input-box { margin: 30px 0; position: relative; }
-        .code-input-box input { width: 100%; padding: 20px; border: 1px solid #222; border-radius: 12px; font-size: 36px; text-align: center; background: #000; color: #fff; font-weight: 900; font-family: monospace; letter-spacing: 8px; }
-        .code-input-box label { position: absolute; top: -8px; left: 15px; background: #080808; padding: 0 10px; font-size: 9px; font-weight: 800; color: #444; letter-spacing: 2px; }
+        input { 
+            width: 100%; padding: 20px; margin: 30px 0 10px; border: 2px solid rgba(255,255,255,0.1); border-radius: 20px; 
+            font-size: 36px; text-align: center; background: rgba(255,255,255,0.05); color: #fff; font-weight: 900;
+        }
 
         /* --- INTERFAZ APP --- */
         #app { display: none; flex-direction: column; width: 100%; height: 100dvh; position: relative; }
 
-        .top-nav {
+        .top-bar {
             padding: var(--safe-top) 20px 0; height: 80px; display: flex; 
             justify-content: space-between; align-items: center; z-index: 100;
         }
-        .back-btn { background: #111; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; color: #f44; cursor: pointer; border: 1px solid #200; }
-        .room-info { font-size: 12px; font-weight: 900; font-family: monospace; color: #444; letter-spacing: 2px; }
+        .close-btn { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 12px; font-size: 10px; font-weight: 900; color: #fff; cursor: pointer; }
+        .room-tag { font-size: 14px; font-weight: 900; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
 
         .view-container { flex: 1; position: relative; width: 100%; overflow: hidden; }
         .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
         .view.active { display: flex; }
 
-        #view-radar { align-items: center; justify-content: center; background: #000; }
-        .radar-shell {
+        /* RADAR VIEW */
+        #view-radar { align-items: center; justify-content: center; }
+        .radar-glow {
             position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 50%;
+            border: 4px solid rgba(255,0,255,0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 50px rgba(255,0,255,0.05);
         }
-        .radar-shell::before { content: ''; position: absolute; width: 100%; height: 100%; border: 1px solid rgba(66, 133, 244, 0.1); border-radius: 50%; animation: pulse 4s infinite linear; }
-        @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 0; } }
+        .radar-glow::before { content: ''; position: absolute; width: 100%; height: 100%; border: 2px solid var(--accent); border-radius: 50%; opacity: 0.2; animation: scan 3s infinite ease-out; }
+        @keyframes scan { 0% { transform: scale(0.5); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 0; } }
 
-        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); border: 2px solid #fff; }
-        .arrow-v { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.3s cubic-bezier(0.1, 0.5, 0.5, 1); filter: drop-shadow(0 0 10px var(--accent)); }
+        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.6s cubic-bezier(0.1, 0.5, 0.5, 1); }
+        .friend-led { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px #fff, 0 0 60px var(--accent); border: 5px solid var(--accent); }
+
+        .arrow-party { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 60px solid #fff; transition: transform 0.3s; filter: drop-shadow(0 0 20px var(--accent)); }
         
-        .metrics { text-align: center; margin-top: 40px; }
-        .metrics h2 { font-size: 70px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; font-family: monospace; }
-        .metrics span { font-size: 11px; font-weight: 900; color: #333; letter-spacing: 4px; text-transform: uppercase; }
+        .distance-panel { text-align: center; margin-top: 40px; }
+        .dist-num { font-size: 80px; font-weight: 900; margin: 0; line-height: 1; color: #fff; text-shadow: 0 0 20px var(--accent); }
+        .dist-text { font-size: 14px; font-weight: 800; color: var(--accent); letter-spacing: 5px; opacity: 0.7; }
 
-        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #0f0; background: #000; }
-        .raw-data-box { background: #050505; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #111; color: #4285F4; white-space: pre-wrap; word-break: break-all; }
+        /* LOGS VIEW (BLACK BOX) */
+        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: monospace; font-size: 11px; color: #4ade80; background: #000; }
+        .raw-log-box { background: #0a0a0a; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #222; color: #00ffff; white-space: pre-wrap; word-break: break-all; }
 
-        .bottom-tabs {
-            height: 70px; background: #050505; border-top: 1px solid #111; 
-            display: flex; padding-bottom: var(--safe-bottom);
+        /* BOTTOM NAV */
+        .nav-party {
+            height: 80px; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.05); 
+            display: flex; padding-bottom: var(--safe-bottom); backdrop-filter: blur(10px);
         }
-        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; font-size: 9px; font-weight: 900; letter-spacing: 2px; }
-        .tab-btn.active { color: var(--accent); }
-        .tab-btn span.icon { font-size: 18px; margin-bottom: 4px; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+        .nav-btn.active { color: #fff; }
+        .nav-btn .ico { font-size: 24px; margin-bottom: 4px; }
 
-        .gps-status { position: fixed; top: 15px; right: 20px; font-size: 8px; font-weight: 900; color: #222; z-index: 200; letter-spacing: 1px; }
-        .gps-on { color: #4ade80 !important; }
+        .gps-led { position: fixed; top: 15px; right: 20px; font-size: 10px; font-weight: 900; color: #444; z-index: 200; }
+        .gps-on { color: #00ff00 !important; text-shadow: 0 0 10px #00ff00; }
     </style>
 </head>
 <body>
 
+    <!-- SCREEN 1: SETUP -->
     <div id="setup">
-        <div class="logo-area">
-            <div class="reticle"></div>
-            <h1>PRECISION POINTER</h1>
-            <p>TACTICAL LOCATOR 2026</p>
-        </div>
+        <div class="party-icon">✨</div>
+        <h1>AMIGO FINDER</h1>
+        <div class="party-tag">PARTY ENGINE 2026</div>
 
         <div class="setup-card">
-            <button class="btn" onclick="createRoom()">GENERATE SESSION</button>
-            <div class="code-input-box">
-                <label>VINCULAR LINK</label>
-                <input type="number" id="roomCode" placeholder="0000" maxlength="4">
-            </div>
-            <button class="btn btn-link" onclick="joinRoom()">ESTABLISH CONNECTION</button>
+            <button class="btn" onclick="createRoom()">NUEVA SALA</button>
+            <input type="number" id="roomCode" placeholder="0000" maxlength="4">
+            <button class="btn btn-join" onclick="joinRoom()">UNIRSE A FIESTA</button>
         </div>
     </div>
 
+    <!-- SCREEN 2: RADAR -->
     <div id="app">
-        <div class="gps-status" id="gpsState">SIGNAL: SEARCHING</div>
+        <div class="gps-led" id="gpsLed">GPS: OFF</div>
 
-        <header class="top-nav">
-            <div class="back-btn" onclick="exitSession()">ABORT SESSION</div>
-            <div class="room-info" id="roomDisplay">NET_ID: 0000</div>
+        <header class="top-bar">
+            <div class="close-btn" onclick="exit()">SALIR</div>
+            <div class="room-tag" id="roomDisp">SALA: 0000</div>
         </header>
 
         <main class="view-container">
             <section id="view-radar" class="view active">
-                <div class="radar-shell">
-                    <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
-                    <div class="arrow-v" id="arrow"></div>
+                <div class="radar-glow">
+                    <div class="orbit" id="orbit"><div class="friend-led"></div></div>
+                    <div class="arrow-party" id="arrow"></div>
                 </div>
-                <div class="metrics">
-                    <h2 id="dist">--</h2>
-                    <span id="unit">Waiting for fix...</span>
+                <div class="distance-panel">
+                    <h2 class="dist-num" id="dist">--</h2>
+                    <span class="dist-text" id="unit">BUSCANDO AMIGO...</span>
                 </div>
             </section>
 
             <section id="view-logs" class="view">
                 <div class="log-screen" id="log-console">
-                    [SYSTEM] Precision Kernel Active. Awaiting data...
+                    [SYSTEM] Party Sync Iniciado...
                 </div>
             </section>
         </main>
 
-        <nav class="bottom-tabs">
-            <div class="tab-btn active" id="tab-radar" onclick="showTab('radar')">
-                <span class="icon">◎</span><span>RADAR</span>
+        <nav class="nav-party">
+            <div class="nav-btn active" id="tab-radar" onclick="showTab('radar')">
+                <span class="ico">📍</span><span>RADAR</span>
             </div>
-            <div class="tab-btn" id="tab-logs" onclick="showTab('logs')">
-                <span class="icon">▤</span><span>BLACK BOX</span>
+            <div class="nav-btn" id="tab-logs" onclick="showTab('logs')">
+                <span class="ico">📊</span><span>BLACK BOX</span>
             </div>
         </nav>
     </div>
@@ -165,19 +162,19 @@
 
         function showTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
             document.getElementById('tab-' + id).classList.add('active');
         }
 
-        function exitSession() { if(confirm("¿Abortar conexión táctica?")) location.reload(); }
+        function exit() { if(confirm("¿Salir de la fiesta?")) location.reload(); }
 
-        // --- BLACK BOX ENGINE (UNTOUCHED LOGIC) ---
+        // --- BLACK BOX ENGINE (PROTECTED) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
             const time = new Date().toLocaleTimeString();
             let html = `<div style="margin-bottom:15px; border-bottom: 1px solid #111; padding-bottom: 10px;">[${time}] ${msg}`;
-            if (raw) html += `<div class="raw-data-box">${JSON.stringify(raw, null, 2)}</div>`;
+            if (raw) html += `<div class="raw-log-box">${JSON.stringify(raw, null, 2)}</div>`;
             html += `</div>`;
             console.innerHTML += html;
             console.scrollTop = console.scrollHeight;
@@ -185,10 +182,10 @@
 
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-            document.getElementById('gpsState').innerText = "SIGNAL: ACTIVE";
-            document.getElementById('gpsState').classList.add('gps-on');
-            if(!sessionId) addLog("SIGNAL_LOCKED", myLoc);
-        }, (err) => addLog("SIGNAL_ERROR: " + err.message), { enableHighAccuracy: true });
+            document.getElementById('gpsLed').innerText = "GPS: ACTIVE";
+            document.getElementById('gpsLed').classList.add('gps-on');
+            if(!sessionId) addLog("GPS_CONNECTED", myLoc);
+        }, (err) => addLog("GPS_ERROR: " + err.message), { enableHighAccuracy: true });
 
         window.addEventListener('deviceorientationabsolute', (e) => {
             heading = e.alpha || e.webkitCompassHeading || 0;
@@ -199,7 +196,7 @@
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
             const url = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
-            addLog("PULSE_OUT", { sala: sessionId, lat: myLoc.lat, lon: myLoc.lon });
+            addLog("PULSE_OUT", { sala: sessionId });
             const script = document.createElement("script");
             script.src = url;
             window[cb] = function(res) {
@@ -218,20 +215,20 @@
 
         function createRoom() {
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
-            myId = "u1"; launch();
+            myId = "u1"; start();
         }
 
         function joinRoom() {
             const code = document.getElementById('roomCode').value;
             if (code.length < 4) return;
-            sessionId = code; myId = "u2"; launch();
+            sessionId = code; myId = "u2"; start();
         }
 
-        function launch() {
+        function start() {
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('roomDisplay').innerText = "NET_ID: " + sessionId;
-            addLog(`HANDSHAKE_INIT: ${sessionId} | NODE: ${myId}`);
+            document.getElementById('roomDisp').innerText = "SALA: " + sessionId;
+            addLog(`PARTY_START: ${sessionId} | ROLE: ${myId}`);
         }
 
         function updateUI() {
@@ -243,13 +240,11 @@
             document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
             if (dist < 1) {
                 document.getElementById('dist').innerText = (dist * 1000).toFixed(0);
-                document.getElementById('unit').innerText = "METERS";
+                document.getElementById('unit').innerText = "METROS";
             } else {
                 document.getElementById('dist').innerText = dist.toFixed(2);
-                document.getElementById('unit').innerText = "KILOMETERS";
+                document.getElementById('unit').innerText = "KILÓMETROS";
             }
-            const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
-            document.documentElement.style.setProperty('--accent', color);
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
