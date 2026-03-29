@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Google Server</title>
+    <title>Amigo-Pointer 2026 | Google Diagnostic</title>
     <style>
         :root { 
-            --accent: #4285F4; /* Azul Google */
+            --accent: #4285F4; 
             --bg: #0a0a0a; 
             --text: #ffffff;
             --safe-top: env(safe-area-inset-top, 20px);
@@ -24,6 +24,7 @@
             height: 100dvh; overflow: hidden; 
         }
 
+        /* --- UI PRINCIPAL --- */
         #setup { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 500px; padding: 40px 10%; height: 100%; }
         .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%; font-size: 18px; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
         input { width: 100%; padding: 20px; margin: 15px 0; border: 3px solid #333; border-radius: 18px; font-size: 26px; text-align: center; background: #1a1a1a; font-weight: 900; color: #fff; }
@@ -36,71 +37,36 @@
         .main-view { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
 
         .radar-box { position: relative; width: clamp(260px, 75vmin, 420px); height: clamp(260px, 75vmin, 420px); display: flex; align-items: center; justify-content: center; }
-
-        .proximity-halo {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            opacity: 0.3;
-            transform: scale(var(--pulse-scale));
-            transition: transform 0.2s ease-out, border-color 0.3s;
-            box-shadow: 0 0 30px var(--accent);
-        }
-
-        .compass-outer { 
-            position: relative; 
-            width: 85%; height: 85%; 
-            border: 4px solid rgba(255,255,255,0.1); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02);
-            z-index: 2;
-        }
-
-        .friend-orbit {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            transition: transform 0.5s linear; /* Más lento por la latencia de Google */
-        }
-        .friend-dot {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 20px var(--accent);
-        }
-
-        #arrow { 
-            width: 0; height: 0; 
-            border-left: 20px solid transparent; border-right: 20px solid transparent; 
-            border-bottom: 60px solid var(--accent); 
-            transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); 
-            filter: drop-shadow(0 0 10px var(--accent));
-        }
-
-        .center-pin { position: absolute; width: 10px; height: 10px; background: #fff; border-radius: 50%; }
+        .proximity-halo { position: absolute; width: 100%; height: 100%; border: 2px solid var(--accent); border-radius: 50%; opacity: 0.3; transform: scale(var(--pulse-scale)); transition: transform 0.2s ease-out; box-shadow: 0 0 30px var(--accent); }
+        .compass-outer { position: relative; width: 85%; height: 85%; border: 4px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); z-index: 2; }
+        .friend-orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s linear; }
+        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); }
+        #arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 60px solid var(--accent); transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); filter: drop-shadow(0 0 10px var(--accent)); }
         
-        .info-panel { text-align: center; margin-top: 30px; }
         #dist { font-size: clamp(50px, 15vw, 85px); font-weight: 900; line-height: 1; margin: 10px 0; }
         #status { font-size: 14px; color: #666; letter-spacing: 4px; font-weight: 800; }
         
-        .exit-btn { color: #ff4444; font-weight: 800; font-size: 14px; padding: 12px 30px; border-radius: 12px; border: 2px solid #ff4444; margin-bottom: 20px; cursor: pointer; }
+        /* --- PANEL DE DIAGNÓSTICO (NUEVO) --- */
+        #diag-panel { 
+            position: fixed; bottom: -80vh; left: 0; width: 100%; height: 80vh; 
+            background: #111; border-top: 4px solid var(--accent); 
+            z-index: 100; transition: bottom 0.4s cubic-bezier(0.1, 0.5, 0.5, 1);
+            display: flex; flex-direction: column; padding: 20px; color: #0f0; font-family: 'Courier New', Courier, monospace;
+        }
+        #diag-panel.active { bottom: 0; }
+        .diag-handle { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 15px 15px 0 0; font-weight: 900; font-size: 12px; cursor: pointer; }
+        .diag-log { flex: 1; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; border-radius: 10px; font-size: 11px; margin-top: 10px; }
+        .diag-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .ping { color: #4285F4; }
+
+        .exit-btn { color: #ff4444; font-weight: 800; font-size: 12px; padding: 10px 20px; border-radius: 10px; border: 2px solid #ff4444; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="setup">
         <h1 style="color: #fff;">🦅 GOOGLE-POINTER</h1>
-        <div style="color: #666; letter-spacing: 3px; margin-bottom: 50px;">GOOGLE APPS SCRIPT SYNC</div>
-        
+        <div style="color: #666; letter-spacing: 3px; margin-bottom: 50px;">PROXIMIDAD GOOGLE v2.0</div>
         <button class="btn" onclick="createRoom()">CREAR RADAR</button>
         <div style="width:100%; display: flex; align-items: center; margin: 30px 0;"><div style="flex:1; height:1px; background:#333;"></div><span style="padding: 0 15px; color:#444;">O</span><div style="flex:1; height:1px; background:#333;"></div></div>
         <input type="number" id="roomCode" placeholder="CÓDIGO RADAR">
@@ -110,41 +76,57 @@
     <div id="app">
         <div class="header">
             <span class="room-tag" id="roomDisplay">SALA: ----</span>
-            <div id="roleDisplay" style="margin-top: 12px; font-size: 12px; color: #444; font-weight: bold;">SINCRO GOOGLE ACTIVADA</div>
+            <div id="roleDisplay" style="margin-top: 12px; font-size: 11px; color: #444; font-weight: bold; letter-spacing: 1px;">MOTOR GOOGLE ACTIVADO</div>
         </div>
         
         <div class="main-view">
             <div class="radar-box">
                 <div class="proximity-halo" id="halo"></div>
-                <div class="friend-orbit" id="orbit">
-                    <div class="friend-dot"></div>
-                </div>
-                <div class="compass-outer">
-                    <div id="arrow"></div>
-                    <div class="center-pin"></div>
-                </div>
+                <div class="friend-orbit" id="orbit"><div class="friend-dot"></div></div>
+                <div class="compass-outer"><div id="arrow"></div></div>
             </div>
             
             <div class="info-panel">
                 <div id="dist">--m</div>
-                <div id="status">PULSANDO GOOGLE...</div>
+                <div id="status">INICIANDO...</div>
             </div>
         </div>
-        
-        <div style="display:flex; justify-content:center;">
-            <div class="exit-btn" onclick="location.reload()">DESCONECTAR</div>
+
+        <!-- PANEL DE DIAGNÓSTICO (DIAG PANEL) -->
+        <div id="diag-panel">
+            <div class="diag-handle" onclick="toggleDiag()">DIAGNÓSTICO GOOGLE</div>
+            <div class="diag-header">
+                <span>RAW LOGS: GOOGLE SCRIPT</span>
+                <span class="ping" id="last-ping">LATENCIA: --ms</span>
+            </div>
+            <div id="log-console" class="diag-log">
+                [SYSTEM] Esperando conexión...
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                <span style="font-size:10px; color:#666;">AMIGO-POINTER 2026 | BLACK BOX</span>
+                <div class="exit-btn" onclick="location.reload()">CERRAR SESIÓN</div>
+            </div>
         </div>
     </div>
 
     <script>
         // 🦅 CONFIG: GOOGLE APPS SCRIPT WEB APP URL
-        // Debes reemplazar esta URL con la que te dé Google al implementar tu Code.gs
         const GOOGLE_SCRIPT_URL = "REEMPLAZAR_CON_TU_URL_DE_WEB_APP_GOOGLE";
 
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
         let pulseTimer = 0;
 
-        // --- SENSORES ---
+        function addLog(msg, type = 'info') {
+            const console = document.getElementById('log-console');
+            const color = type === 'error' ? '#f00' : (type === 'sync' ? '#4285F4' : '#0f0');
+            const time = new Date().toLocaleTimeString();
+            console.innerHTML += `<div style="color:${color}">[${time}] ${msg}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function toggleDiag() { document.getElementById('diag-panel').classList.toggle('active'); }
+
+        // SENSORES
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientationabsolute', (e) => {
                 heading = e.alpha || e.webkitCompassHeading || 0;
@@ -153,47 +135,51 @@
 
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        }, null, { enableHighAccuracy: true });
+            addLog(`GPS Localizado: ${myLoc.lat.toFixed(4)}, ${myLoc.lon.toFixed(4)}`, 'info');
+        }, (err) => addLog("Error GPS: " + err.message, 'error'), { enableHighAccuracy: true });
 
-        // --- MOTOR DE SINCRONIZACIÓN GOOGLE ---
+        // MOTOR DE SINCRONIZACIÓN GOOGLE
         async function syncWithGoogle() {
             if (!sessionId || !myLoc) return;
 
+            const start = Date.now();
+            const data = { sala: sessionId, userId: myId, coords: myLoc };
+            addLog(`ENVIANDO A GOOGLE: ${JSON.stringify(data)}`, 'sync');
+
             try {
+                // Nota: Usamos fetch con modo 'no-cors' para Google Apps Script
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Necesario para GAS
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sala: sessionId,
-                        userId: myId,
-                        coords: myLoc
-                    })
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
                 });
 
-                // Como usamos no-cors, no podemos leer la respuesta directamente.
-                // Requeriremos una llamada secundaria o una configuración CORS específica en GAS.
-                // Para este ejemplo, simplificamos asumiendo que el usuario quiere usar GAS puro.
+                const latency = Date.now() - start;
+                document.getElementById('last-ping').innerText = `LATENCIA: ${latency}ms`;
+                addLog(`GOOGLE RESPONDIÓ (Código: ${response.status || 'OK'}) | Latencia: ${latency}ms`, 'info');
                 
-                // Opción Pro: Usar JSONP o servidor proxy si se requiere leer la respuesta de Google.
-                // Aquí simulamos la llegada del amigo para la UI:
+                // En modo no-cors no podemos leer el body, pero en un entorno real 
+                // configuraríamos GAS con JSONP o un proxy para recibir el friendLoc.
                 updateUI();
-            } catch (e) { console.error("Sync Error:", e); }
+            } catch (e) { 
+                addLog(`ERROR DE CONEXIÓN: ${e.message}`, 'error');
+            }
         }
 
-        // Intervalo de Sincronización (Cada 3 segundos para no saturar Google)
         setInterval(syncWithGoogle, 3000);
 
         function createRoom() {
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
             myId = "u1";
+            addLog(`SALA CREADA: ${sessionId} (ROL: LÍDER)`, 'info');
             startSession();
         }
 
         function joinRoom() {
             sessionId = document.getElementById('roomCode').value;
-            if (sessionId.length < 4) return;
+            if (sessionId.length < 4) return alert("Código inválido");
             myId = "u2";
+            addLog(`UNIÉNDOSE A SALA: ${sessionId} (ROL: SEGUIDOR)`, 'info');
             startSession();
         }
 
@@ -207,8 +193,8 @@
             if (!myLoc || !friendLoc) return;
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
-            
             const arrowAngle = (bearing - heading + 360) % 360;
+            
             document.getElementById('arrow').style.transform = `rotate(${arrowAngle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${arrowAngle}deg)`;
             
@@ -220,7 +206,7 @@
             document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
             const color = dist < 0.03 ? "#4285F4" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('status').innerText = dist < 0.03 ? "AMIGO ENCONTRADO" : "SINCRONIZANDO...";
+            document.getElementById('status').innerText = dist < 0.03 ? "OBJETIVO FIJADO" : "PULSANDO SEÑAL...";
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
