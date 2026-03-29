@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Amigo-Pointer 2026</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --accent: #4ade80; --bg: #ffffff; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        #setup { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
+        .btn { background: #000; color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0; font-size: 16px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; font-size: 20px; text-align: center; box-sizing: border-box; }
+        
+        #app { display: none; text-align: center; width: 100%; }
+        .compass-container { position: relative; width: 280px; height: 280px; border: 4px solid var(--accent); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #f9f9f9; }
+        #arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 60px solid var(--accent); transition: transform 0.1s ease-out; }
+        #dist { font-size: 48px; font-weight: 900; margin-top: 20px; color: #000; }
+        #status { font-size: 14px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+        .header { position: absolute; top: 40px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="setup">
+        <h1>🦅 AMIGO-POINTER</h1>
+        <p>EDICIÓN 2026</p>
+        <button class="btn" onclick="createRoom()">CREAR SALA</button>
+        <div style="margin: 30px 0; height: 1px; background: #eee;"></div>
+        <input type="number" id="roomCode" placeholder="CÓDIGO DE 4 DÍGITOS">
+        <button class="btn" style="background: #333;" onclick="joinRoom()">UNIRSE A AMIGO</button>
+    </div>
+
+    <div id="app">
+        <div class="header">
+            <b id="roomDisplay">SALA: ----</b><br>
+            <small id="roleDisplay">BUSCANDO...</small>
+        </div>
+        
+        <div class="compass-container">
+            <div id="arrow"></div>
+        </div>
+        
+        <div id="dist">--m</div>
+        <div id="status">UBICANDO AMIGO...</div>
+        
+        <button onclick="location.reload()" style="margin-top: 50px; background: none; border: none; color: red; cursor: pointer;">SALIR</button>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN PÚBLICA DE FIREBASE (DEMO)
+        // Nota: Para uso real, el usuario debería poner su propia config aquí.
+        const firebaseConfig = {
+            databaseURL: "https://amigo-pointer-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let sessionId = "";
+        let myId = "";
+        let myLoc = null;
+        let friendLoc = null;
+        let heading = 0;
+
+        // --- LÓGICA DE SENSORES ---
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientationabsolute', (e) => {
+                heading = e.alpha || e.webkitCompassHeading || 0;
+                updateUI();
+            }, true);
+        }
+
+        navigator.geolocation.watchPosition((pos) => {
+            myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+            if (sessionId) syncLoc();
+            updateUI();
+        }, (err) => alert("Activa el GPS para funcionar"), { enableHighAccuracy: true });
+
+        // --- LÓGICA DE SALAS ---
+        function createRoom() {
+            sessionId = Math.floor(1000 + Math.random() * 9000).toString();
+            myId = "u1";
+            startSession();
+        }
+
+        function joinRoom() {
+            sessionId = document.getElementById('roomCode').value;
+            if (sessionId.length !== 4) return alert("Código inválido");
+            myId = "u2";
+            startSession();
+        }
+
+        function startSession() {
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('roomDisplay').innerText = "SALA: " + sessionId;
+            document.getElementById('roleDisplay').innerText = myId === "u1" ? "LÍDER" : "SEGUIDOR";
+            
+            const friendId = myId === "u1" ? "u2" : "u1";
+            db.ref('sessions/' + sessionId + '/' + friendId).on('value', (snap) => {
+                friendLoc = snap.val();
+                updateUI();
+            });
+        }
+
+        function syncLoc() {
+            db.ref('sessions/' + sessionId + '/' + myId).set(myLoc);
+        }
+
+        // --- CÁLCULOS GEOGRÁFICOS ---
+        function updateUI() {
+            if (!myLoc || !friendLoc) return;
+
+            const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
+            const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
+            
+            // Ángulo final = Rumbo al amigo - Mi orientación actual
+            const angle = (bearing - heading + 360) % 360;
+            
+            document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
+            document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
+            
+            const color = dist < 0.05 ? "#4ade80" : (dist < 0.5 ? "#facc15" : "#f87171");
+            document.documentElement.style.setProperty('--accent', color);
+            document.getElementById('status').innerText = dist < 0.05 ? "¡ESTÁ AQUÍ!" : "SIGUE LA FLECHA";
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function getBearing(lat1, lon1, lat2, lon2) {
+            const l1 = lat1 * Math.PI / 180, l2 = lat2 * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180;
+            const y = Math.sin(dl) * Math.cos(l2), x = Math.cos(l1) * Math.sin(l2) - Math.sin(l1) * Math.cos(l2) * Math.cos(dl);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+    </script>
+</body>
+</html>
