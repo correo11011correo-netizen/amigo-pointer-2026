@@ -3,55 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Deep Diagnostic</title>
+    <title>Amigo-Pointer 2026 | BLACK BOX RAW</title>
     <style>
-        :root { --accent: #4285F4; --bg: #0a0a0a; --text: #ffffff; }
+        :root { --accent: #4285F4; --bg: #050505; --text: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; height: 100dvh; overflow: hidden; }
+        body { font-family: 'Consolas', 'Monaco', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; height: 100dvh; overflow: hidden; }
         
         #setup { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 500px; padding: 40px 10%; height: 100%; }
         .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%; font-size: 18px; margin: 10px 0; }
         input { width: 100%; padding: 20px; margin: 15px 0; border: 3px solid #333; border-radius: 18px; font-size: 26px; text-align: center; background: #1a1a1a; color: #fff; font-weight: bold; }
 
         #app { display: none; flex-direction: column; width: 100%; height: 100%; }
-        .main-view { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .radar-box { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; }
-        .compass-outer { position: relative; width: 100%; height: 100%; border: 4px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--accent); }
-        #arrow { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.2s; }
-        
-        #dist { font-size: 60px; font-weight: 900; margin-top: 20px; }
-        
-        /* DIAGNOSTIC PANEL */
-        #diag-panel { position: fixed; bottom: 0; left: 0; width: 100%; height: 40%; background: #000; border-top: 2px solid #333; display: flex; flex-direction: column; z-index: 1000; }
-        .log-area { flex: 1; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 10px; color: #0f0; background: #000; }
-        .log-header { padding: 10px; background: #111; font-size: 11px; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
-        .raw-data { color: #4285F4; background: #050505; padding: 5px; margin: 5px 0; border-left: 2px solid #4285F4; white-space: pre-wrap; }
+        .main-view { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #111 0%, #000 100%); }
+        .radar-box { position: relative; width: 250px; height: 250px; display: flex; align-items: center; justify-content: center; border: 2px solid #222; border-radius: 50%; }
+        #arrow { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 10px var(--accent)); }
+        #dist { font-size: 50px; font-weight: 900; margin-top: 20px; color: var(--accent); }
+
+        /* --- BLACK BOX / RAW LOGS SECTION --- */
+        #black-box { 
+            width: 100%; height: 50%; background: #000; border-top: 2px solid #444; 
+            display: flex; flex-direction: column; font-size: 10px; 
+        }
+        .bb-header { background: #222; padding: 8px 15px; font-weight: bold; display: flex; justify-content: space-between; color: #aaa; border-bottom: 1px solid #333; }
+        .bb-content { flex: 1; overflow-y: auto; padding: 10px; color: #0f0; }
+        .bb-entry { margin-bottom: 15px; border-left: 2px solid #333; padding-left: 10px; }
+        .bb-raw-response { color: #4285F4; background: #080808; padding: 8px; margin-top: 5px; border-radius: 4px; word-break: break-all; white-space: pre-wrap; border: 1px dashed #222; }
+        .bb-error { color: #ff4444; }
+        .bb-tag { font-weight: bold; margin-right: 5px; color: #fff; }
     </style>
 </head>
 <body>
 
     <div id="setup">
-        <h1>🦅 RADAR-POINTER</h1>
-        <button class="btn" onclick="createRoom()">CREAR SALA</button>
-        <input type="number" id="roomCode" placeholder="CÓDIGO AMIGO">
+        <h1>🦅 RADAR BLACK BOX</h1>
+        <button class="btn" onclick="createRoom()">NUEVA SALA</button>
+        <input type="number" id="roomCode" placeholder="CÓDIGO">
         <button class="btn" style="background: #333; color: #fff;" onclick="joinRoom()">UNIRSE</button>
     </div>
 
     <div id="app">
         <div class="main-view">
-            <div class="radar-box">
-                <div class="compass-outer"><div id="arrow"></div></div>
-            </div>
+            <div class="radar-box"><div id="arrow"></div></div>
             <div id="dist">--m</div>
         </div>
 
-        <div id="diag-panel">
-            <div class="log-header">
-                <span>RAW LOGS: GOOGLE SYNC</span>
-                <span id="gps-status" style="color: #f87171;">GPS: OFF</span>
+        <div id="black-box">
+            <div class="bb-header">
+                <span>[BLACK BOX / RAW LOGS]</span>
+                <span id="bb-status">SISTEMA: OK</span>
             </div>
-            <div class="log-area" id="log-console">
-                [SYSTEM] Inicializando sensores...
+            <div class="bb-content" id="log-area">
+                [INIT] Esperando interacción del usuario...
             </div>
         </div>
     </div>
@@ -60,78 +62,64 @@
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxVo_2XXuldsiRyHDFKjyAbQNsoHuUBhyL4h3oAdEhi5xh9ZKYZHV3pylzBktPOUGwgmg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
-        function addLog(msg, raw = null) {
-            const console = document.getElementById('log-console');
+        function logRaw(title, data, isError = false) {
+            const area = document.getElementById('log-area');
             const time = new Date().toLocaleTimeString();
-            let entry = `<div>[${time}] ${msg}`;
-            if (raw) entry += `<div class="raw-data">${JSON.stringify(raw, null, 2)}</div>`;
-            entry += `</div>`;
-            console.innerHTML += entry;
-            console.scrollTop = console.scrollHeight;
+            let html = `<div class="bb-entry ${isError ? 'bb-error' : ''}">`;
+            html += `<div><span class="bb-tag">[${time}] ${title}</span></div>`;
+            html += `<div class="bb-raw-response">${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}</div>`;
+            html += `</div>`;
+            area.innerHTML += html;
+            area.scrollTop = area.scrollHeight;
         }
 
-        // --- SISTEMA DE GPS CON DIAGNÓSTICO ---
-        if ("geolocation" in navigator) {
-            addLog("Solicitando permiso de GPS...");
-            navigator.geolocation.watchPosition(
-                (pos) => {
-                    myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                    document.getElementById('gps-status').innerText = "GPS: OK";
-                    document.getElementById('gps-status').style.color = "#4ade80";
-                    addLog(`GPS RECIBIDO: ${myLoc.lat.toFixed(5)}, ${myLoc.lon.toFixed(5)}`);
-                },
-                (err) => {
-                    let msg = "Error GPS desconocido";
-                    if (err.code === 1) msg = "PERMISO DENEGADO (Activa el GPS)";
-                    if (err.code === 2) msg = "POSICIÓN NO DISPONIBLE (Sin señal)";
-                    if (err.code === 3) msg = "TIMEOUT GPS";
-                    addLog("CRÍTICO: " + msg, {code: err.code});
-                    document.getElementById('gps-status').innerText = "GPS: ERROR";
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        } else {
-            addLog("ERROR: El navegador no soporta Geolocation", null);
-        }
+        // --- GPS ---
+        navigator.geolocation.watchPosition((pos) => {
+            myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+            if(!sessionId) logRaw("GPS_LOCKED", myLoc);
+        }, (err) => logRaw("GPS_ERROR", err.message, true), { enableHighAccuracy: true });
 
-        // --- BRÚJULA FÍSICA ---
+        // --- BRÚJULA ---
         window.addEventListener('deviceorientationabsolute', (e) => {
             heading = e.alpha || e.webkitCompassHeading || 0;
-            if (sessionId && friendLoc) updateUI();
+            if(sessionId && friendLoc) updateUI();
         }, true);
 
-        // --- MOTOR DE SINCRONIZACIÓN (JSONP) ---
-        function sync() {
-            if (!sessionId) return;
-            
-            if (!myLoc) {
-                addLog("SYNC: Esperando señal de GPS válida para enviar...");
-                return;
+        // --- MOTOR DE COMUNICACIÓN RAW ---
+        async function sync() {
+            if (!sessionId || !myLoc) return;
+
+            const url = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=RAW_DATA`;
+            logRaw("OUTGOING_REQUEST", { url: url, payload: { sala: sessionId, userId: myId, coords: myLoc } });
+
+            try {
+                // Intentamos fetch con JSONP manual para ver la respuesta cruda
+                const script = document.createElement("script");
+                const callbackName = "RAW_DATA_" + Date.now();
+                script.src = url.replace("callback=RAW_DATA", "callback=" + callbackName);
+                
+                window[callbackName] = function(rawJson) {
+                    logRaw("INCOMING_RAW_RESPONSE", rawJson);
+                    if (rawJson.friend_data) {
+                        friendLoc = rawJson.friend_data;
+                        updateUI();
+                    }
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                };
+
+                script.onerror = (e) => {
+                    logRaw("NETWORK_FAIL", "Fallo al cargar el script de Google. Posible URL errónea o Implementación Privada.", true);
+                    document.body.removeChild(script);
+                };
+
+                document.body.appendChild(script);
+
+            } catch (err) {
+                logRaw("SYSTEM_CRASH", err.stack, true);
             }
-
-            addLog(`SYNC: Enviando pulsación a Google...`);
-            const cb = "cb_" + Math.floor(Math.random() * 100000);
-            const script = document.createElement("script");
-            script.src = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
-            
-            window[cb] = function(rawResponse) {
-                addLog("--- [RAW RESPONSE DESDE GOOGLE] ---", rawResponse);
-                if (rawResponse.status === "OK" && rawResponse.friend_data) {
-                    friendLoc = rawResponse.friend_data;
-                    updateUI();
-                }
-                delete window[cb];
-                document.body.removeChild(script);
-            };
-
-            script.onerror = () => {
-                addLog("ERROR: Fallo de red al conectar con Google Script.");
-                document.body.removeChild(script);
-            };
-            document.body.appendChild(script);
         }
 
-        // Ciclo de sincronización cada 5 segundos
         setInterval(sync, 5000);
 
         function createRoom() {
@@ -139,17 +127,17 @@
             myId = "u1";
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            addLog(`SALA CREADA: ${sessionId} (Líder)`);
+            logRaw("SESSION_CREATED", { id: sessionId, role: "u1" });
         }
 
         function joinRoom() {
             const code = document.getElementById('roomCode').value;
-            if (code.length < 4) return alert("Código inválido");
+            if (code.length < 4) return;
             sessionId = code;
             myId = "u2";
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            addLog(`UNIÉNDOSE A SALA: ${sessionId} (Seguidor)`);
+            logRaw("SESSION_JOINED", { id: sessionId, role: "u2" });
         }
 
         function updateUI() {
