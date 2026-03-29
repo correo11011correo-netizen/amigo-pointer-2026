@@ -3,96 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | High Precision</title>
+    <title>Amigo-Pointer 2026 | Pro Precision</title>
     <style>
         :root { 
-            --accent: #00d2ff; --primary: #7000ff; --detail: #ff007f; --bg: #050010; --text: #ffffff;
-            --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px);
+            --accent: #00d2ff; 
+            --primary: #8a2be2; 
+            --detail: #ff007f; 
+            --bg-top: #1a0b2e;
+            --bg-bottom: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; font-family: 'Inter', sans-serif; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); 
+            color: #fff; overflow: hidden; 
+        }
 
-        /* --- UI PRINCIPAL --- */
-        #setup { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100dvh; padding: 0 10%; text-align: center; background: radial-gradient(circle at center, #1a0033 0%, #050010 100%); }
-        .btn { background: linear-gradient(45deg, var(--primary), var(--accent)); color: #fff; border: none; padding: 20px; border-radius: 18px; font-weight: 900; cursor: pointer; width: 100%; font-size: 15px; box-shadow: 0 10px 30px rgba(112,0,255,0.3); text-transform: uppercase; }
-        input { width: 100%; padding: 20px; margin: 25px 0 10px; border: 2px solid #1a1a1a; border-radius: 18px; font-size: 32px; text-align: center; background: #000; color: #fff; font-weight: 900; }
+        /* --- PANTALLA DE INICIO PROFESIONAL --- */
+        #setup { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            width: 100%; height: 100dvh; padding: 0 10%; text-align: center;
+        }
 
+        .hero-title { margin-bottom: 40px; }
+        .hero-title h1 { font-size: clamp(32px, 8vw, 42px); font-weight: 800; letter-spacing: -1px; margin: 0; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-title p { color: var(--primary); font-size: 12px; font-weight: 700; letter-spacing: 5px; margin-top: 8px; text-transform: uppercase; }
+
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); padding: 40px 30px; border-radius: 32px;
+            width: 100%; max-width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+
+        .btn-pro { 
+            background: linear-gradient(90deg, var(--primary), var(--accent)); color: #fff; border: none; 
+            padding: 20px; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%; 
+            font-size: 16px; box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3); transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-pro:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(138, 43, 226, 0.2); }
+        .btn-outline { background: transparent; border: 1px solid #333; color: #888; margin-top: 15px; font-size: 13px; }
+
+        input.pro-input { 
+            width: 100%; padding: 22px; margin: 25px 0 12px; border: 1px solid #333; border-radius: 18px; 
+            font-size: 32px; text-align: center; background: rgba(0,0,0,0.3); color: #fff; font-weight: 800;
+            letter-spacing: 10px;
+        }
+
+        /* --- INTERFAZ APP --- */
         #app { display: none; flex-direction: column; width: 100%; height: 100dvh; position: relative; }
-        .top-nav { padding: var(--safe-top) 20px 0; height: 80px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .abort-btn { background: #200; border: 1px solid #400; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #f44; cursor: pointer; }
-        
-        .radar-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .radar-disc { position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px); border: 2px solid rgba(0, 210, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #0a001a 0%, #000 100%); }
-        
-        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        .friend-led { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff, 0 0 40px var(--detail); border: 4px solid var(--detail); }
-        .arrow-el { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 65px solid var(--accent); transition: transform 0.1s linear; filter: drop-shadow(0 0 15px var(--accent)); }
-        
-        .metrics { text-align: center; margin-top: 40px; }
-        .m-val { font-size: 80px; font-weight: 900; margin: 0; line-height: 1; text-shadow: 0 0 30px var(--primary); font-family: monospace; }
-        .m-label { font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: 6px; opacity: 0.6; }
 
-        /* INDICADOR DE PRECISIÓN */
-        .acc-pill { position: fixed; top: 15px; right: 20px; font-size: 9px; font-weight: 900; background: #111; padding: 4px 12px; border-radius: 20px; color: #444; border: 1px solid #222; }
-        .acc-good { color: #00ff00 !important; border-color: #00ff0055; }
-        .acc-bad { color: #ffaa00 !important; border-color: #ffaa0055; }
+        .top-nav {
+            padding: var(--safe-top) 20px 0; height: 80px; display: flex; 
+            justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .back-pill { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.2); padding: 10px 20px; border-radius: 50px; font-size: 11px; font-weight: 800; color: #ff4d4d; cursor: pointer; }
+        .room-pill { background: var(--glass); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; color: var(--accent); font-family: monospace; }
 
-        /* BLACK BOX TABS */
-        .nav-bar { height: 75px; background: #080808; border-top: 1px solid #111; display: flex; padding-bottom: var(--safe-bottom); }
-        .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; font-size: 9px; font-weight: 900; letter-spacing: 2px; }
-        .nav-tab.active { color: var(--accent); }
-        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ade80; background: #000; display: none; }
+        .radar-section { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* RADAR HD */
+        .radar-base {
+            position: relative; width: clamp(280px, 82vmin, 420px); height: clamp(280px, 82vmin, 420px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.05) 0%, transparent 80%);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+        
+        /* Grid Lines */
+        .radar-base::before { content: ''; position: absolute; width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
+        .radar-base::after { content: ''; position: absolute; height: 100%; width: 1px; background: rgba(255,255,255,0.05); }
+
+        .radar-ring { position: absolute; border: 1px solid rgba(255,255,255,0.03); border-radius: 50%; }
+        .ring-1 { width: 66%; height: 66%; }
+        .ring-2 { width: 33%; height: 33%; }
+
+        .friend-orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.6s cubic-bezier(0.1, 0.5, 0.5, 1); }
+        .friend-beeper { 
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%); 
+            width: 28px; height: 28px; background: #fff; border-radius: 50%; 
+            box-shadow: 0 0 20px #fff, 0 0 40px var(--detail); border: 4px solid var(--detail); 
+        }
+
+        .pointer-arrow { 
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; 
+            border-bottom: 70px solid var(--accent); transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); 
+            filter: drop-shadow(0 0 15px var(--accent));
+        }
+
+        .info-panel { text-align: center; margin-top: 40px; }
+        .info-panel h2 { font-size: clamp(70px, 18vw, 110px); font-weight: 800; margin: 0; line-height: 0.9; letter-spacing: -4px; font-family: 'Courier New', Courier, monospace; }
+        .info-panel span { font-size: 14px; font-weight: 800; color: var(--accent); letter-spacing: 6px; text-transform: uppercase; opacity: 0.5; }
+
+        /* --- BLACK BOX TABS --- */
+        .tab-navigation { height: 75px; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border-top: 1px solid #222; display: flex; padding-bottom: var(--safe-bottom); }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        .tab-item.active { color: var(--accent); }
+        .tab-item b { font-size: 20px; margin-bottom: 4px; font-weight: normal; }
+
+        .log-screen { flex: 1; overflow-y: auto; padding: 25px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 10px; color: #00ff00; background: #050505; display: none; }
         .log-screen.active { display: block; }
-        .raw-packet { background: #050010; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #1a0033; color: #00d2ff; white-space: pre-wrap; word-break: break-all; }
+        .packet-card { background: #0d0d0d; padding: 15px; margin: 12px 0; border-radius: 12px; border: 1px solid #1a1a1a; color: #00d2ff; white-space: pre-wrap; word-break: break-all; }
+
+        .gps-badge { position: fixed; top: 15px; right: 20px; font-size: 9px; font-weight: 900; color: #333; z-index: 200; background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 50px; border: 1px solid #222; }
+        .gps-active { color: #00ff00 !important; border-color: rgba(0,255,0,0.2); }
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA 1: SETUP -->
     <div id="setup">
-        <h1 style="color: #fff;">AMIGO FINDER ◎</h1>
-        <div style="color: var(--primary); font-size: 10px; letter-spacing: 5px; margin-top: 5px;">PRECISION ENGINE v10.0</div>
-        <div class="setup-card">
-            <button class="btn" onclick="createRoom()">NEW SESSION</button>
-            <input type="number" id="roomCode" placeholder="0000" maxlength="4">
-            <button class="btn" style="background: transparent; border: 1px solid #333; color: #555; margin-top: 15px;" onclick="joinRoom()">JOIN CONNECTION</button>
+        <div class="hero-title">
+            <h1>PRECISION SYNC</h1>
+            <p>Party Locator v11.0</p>
+        </div>
+
+        <div class="glass-card">
+            <button class="btn-pro" onclick="createRoom()">NUEVA SESIÓN</button>
+            <div style="margin: 25px 0; font-size: 10px; color: #444; font-weight: 900; letter-spacing: 2px;">O VINCULAR CÓDIGO</div>
+            <input type="number" id="roomCode" class="pro-input" placeholder="0000" maxlength="4">
+            <button class="btn-pro btn-outline" onclick="joinRoom()">ESTABLECER VÍNCULO</button>
         </div>
     </div>
 
+    <!-- PANTALLA 2: RADAR -->
     <div id="app">
-        <div class="acc-pill" id="accPill">ACCURACY: --m</div>
+        <div class="gps-badge" id="gpsIndicator">SIGNAL: SEARCHING</div>
+
         <header class="top-nav">
-            <div class="abort-btn" onclick="if(confirm('¿Abortar?')) location.reload()">ABORT</div>
-            <div id="idBadge" style="font-family: monospace; font-weight: 900; color: #444;">NET_ID: 0000</div>
+            <div class="back-pill" onclick="if(confirm('¿Finalizar sesión?')) location.reload()">ABORT SESSION</div>
+            <div class="room-pill" id="roomBadge">NET_ID: 0000</div>
         </header>
 
-        <main class="view-container" style="flex: 1; display: flex; flex-direction: column;">
-            <section id="view-radar" class="radar-view active">
-                <div class="radar-disc">
-                    <div class="orbit" id="orbit"><div class="friend-led"></div></div>
-                    <div class="arrow-el" id="arrow"></div>
+        <main class="radar-section">
+            <div id="view-radar" class="view active" style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="radar-base">
+                    <div class="radar-ring ring-1"></div>
+                    <div class="radar-ring ring-2"></div>
+                    <div class="friend-orbit" id="orbit"><div class="friend-beeper"></div></div>
+                    <div class="pointer-arrow" id="arrow"></div>
                 </div>
-                <div class="metrics">
-                    <h2 class="m-val" id="dist">--</h2>
-                    <span class="m-label" id="unit">SCANNING...</span>
+                <div class="info-panel">
+                    <h2 id="dist">--</h2>
+                    <span id="unit">SCANNING...</span>
                 </div>
-            </section>
+            </div>
 
             <section id="view-logs" class="log-screen">
-                [SYSTEM] Precision Kernel Active. Awaiting data...
+                [SYSTEM] Precision Sync Kernel v11.0 Active...
             </section>
         </main>
 
-        <nav class="nav-bar">
-            <div class="nav-tab active" id="tab-radar" onclick="switchTab('radar')">◎ RADAR</div>
-            <div class="nav-tab" id="tab-logs" onclick="switchTab('logs')">▤ BLACK BOX</div>
+        <nav class="tab-navigation">
+            <div class="tab-item active" id="tab-radar" onclick="switchTab('radar')">
+                <b>◎</b><span>RADAR</span>
+            </div>
+            <div class="tab-item" id="tab-logs" onclick="switchTab('logs')">
+                <b>▤</b><span>BLACK BOX</span>
+            </div>
         </nav>
     </div>
 
     <script>
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
-        let sessionId = "", myId = "", myLoc = null, friendLoc = null;
+        let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
         let currentHeading = 0, filteredHeading = 0;
-        const EMA_ALPHA = 0.2; // Suavizado de brújula (0.1 = Muy suave, 0.9 = Rápido)
+        const EMA_ALPHA = 0.15; // Suavizado ultra-fino para v11
 
         function switchTab(id) {
             document.getElementById('view-radar').classList.toggle('active', id === 'radar');
@@ -101,52 +184,44 @@
             document.getElementById('tab-logs').classList.toggle('active', id === 'logs');
         }
 
-        // --- BLACK BOX (PROTECTED) ---
+        // --- BLACK BOX ENGINE (LÓGICA PROTEGIDA) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('view-logs');
             const time = new Date().toLocaleTimeString();
             let html = `<div style="margin-bottom:15px; border-bottom: 1px solid #111; padding-bottom: 10px;">[${time}] ${msg}`;
-            if (raw) html += `<div class="raw-packet">${JSON.stringify(raw, null, 2)}</div>`;
+            if (raw) html += `<div class="packet-card">${JSON.stringify(raw, null, 2)}</div>`;
             html += `</div>`;
             console.innerHTML += html;
             console.scrollTop = console.scrollHeight;
         }
 
-        // --- GPS CON MONITOR DE PRECISIÓN ---
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-            const acc = pos.coords.accuracy;
-            const pill = document.getElementById('accPill');
-            pill.innerText = `ACCURACY: ${acc.toFixed(0)}m`;
-            pill.className = `acc-pill ${acc < 15 ? 'acc-good' : 'acc-bad'}`;
-            if(!sessionId) addLog("GPS_LINK_ESTABLISHED", {lat: myLoc.lat, lon: myLoc.lon, acc: acc});
-        }, (err) => addLog("GPS_ERROR: " + err.message), { enableHighAccuracy: true });
+            const indicator = document.getElementById('gpsIndicator');
+            indicator.innerText = "SIGNAL: ACTIVE";
+            indicator.classList.add('gps-active');
+            if(!sessionId) addLog("SIGNAL_LOCK_SUCCESS", myLoc);
+        }, (err) => addLog("SIGNAL_FAILURE", err.message), { enableHighAccuracy: true });
 
-        // --- BRÚJULA CON FILTRO EMA ---
         window.addEventListener('deviceorientationabsolute', (e) => {
-            let heading = e.alpha || e.webkitCompassHeading || 0;
-            
-            // Corrección de cruce 0/360 para el filtro
-            let diff = heading - filteredHeading;
+            let h = e.alpha || e.webkitCompassHeading || 0;
+            let diff = h - filteredHeading;
             if (diff > 180) diff -= 360;
             if (diff < -180) diff += 360;
-            
             filteredHeading += EMA_ALPHA * diff;
             currentHeading = (filteredHeading + 360) % 360;
-            
-            updateUI();
+            if(sessionId && friendLoc) updateUI();
         }, true);
 
-        // --- SYNC ENGINE ---
-        async function sync() {
+        function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
             const url = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
-            addLog("PULSE_OUT", { id: sessionId });
+            addLog("PULSE_SENT", { id: sessionId });
             const script = document.createElement("script");
             script.src = url;
             window[cb] = function(res) {
-                addLog("PULSE_IN", res);
+                addLog("PULSE_RECEIVED", res);
                 if (res.status === "DEBUG_OK" && res.friend_data) {
                     friendLoc = res.friend_data;
                     updateUI();
@@ -156,29 +231,33 @@
             };
             document.body.appendChild(script);
         }
+
         setInterval(sync, 4000);
 
         function createRoom() { sessionId = Math.floor(1000 + Math.random() * 9000).toString(); myId = "u1"; launch(); }
         function joinRoom() { const code = document.getElementById('roomCode').value; if (code.length < 4) return; sessionId = code; myId = "u2"; launch(); }
-        function launch() { document.getElementById('setup').style.display = 'none'; document.getElementById('app').style.display = 'flex'; document.getElementById('idBadge').innerText = "NET_ID: " + sessionId; addLog(`SESSION_INIT: ${sessionId}`); }
+
+        function launch() {
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('roomBadge').innerText = "NET_ID: " + sessionId;
+            addLog(`HANDSHAKE_COMPLETE: ${sessionId}`);
+        }
 
         function updateUI() {
             if (!myLoc || !friendLoc) return;
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
-            
-            // Dirección final = Rumbo al amigo - Mi orientación actual
             const angle = (bearing - currentHeading + 360) % 360;
-            
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
             
             if (dist < 1) {
                 document.getElementById('dist').innerText = (dist * 1000).toFixed(0);
-                document.getElementById('unit').innerText = "METERS";
+                document.getElementById('unit').innerText = "METROS";
             } else {
                 document.getElementById('dist').innerText = dist.toFixed(2);
-                document.getElementById('unit').innerText = "KILOMETERS";
+                document.getElementById('unit').innerText = "KILÓMETROS";
             }
         }
 
