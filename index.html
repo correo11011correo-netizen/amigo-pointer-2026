@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Google Diagnostic</title>
+    <title>Amigo-Pointer 2026 | Radar Pro</title>
     <style>
         :root { 
             --accent: #4285F4; 
@@ -46,7 +46,7 @@
         #dist { font-size: clamp(50px, 15vw, 85px); font-weight: 900; line-height: 1; margin: 10px 0; }
         #status { font-size: 14px; color: #666; letter-spacing: 4px; font-weight: 800; }
         
-        /* --- PANEL DE DIAGNÓSTICO (NUEVO) --- */
+        /* --- PANEL DE DIAGNÓSTICO --- */
         #diag-panel { 
             position: fixed; bottom: -80vh; left: 0; width: 100%; height: 80vh; 
             background: #111; border-top: 4px solid var(--accent); 
@@ -65,8 +65,8 @@
 <body>
 
     <div id="setup">
-        <h1 style="color: #fff;">🦅 GOOGLE-POINTER</h1>
-        <div style="color: #666; letter-spacing: 3px; margin-bottom: 50px;">PROXIMIDAD GOOGLE v2.0</div>
+        <h1 style="color: #fff;">🦅 RADAR-POINTER</h1>
+        <div style="color: #666; letter-spacing: 3px; margin-bottom: 50px;">GOOGLE ATOMIC RADAR 2026</div>
         <button class="btn" onclick="createRoom()">CREAR RADAR</button>
         <div style="width:100%; display: flex; align-items: center; margin: 30px 0;"><div style="flex:1; height:1px; background:#333;"></div><span style="padding: 0 15px; color:#444;">O</span><div style="flex:1; height:1px; background:#333;"></div></div>
         <input type="number" id="roomCode" placeholder="CÓDIGO RADAR">
@@ -76,7 +76,7 @@
     <div id="app">
         <div class="header">
             <span class="room-tag" id="roomDisplay">SALA: ----</span>
-            <div id="roleDisplay" style="margin-top: 12px; font-size: 11px; color: #444; font-weight: bold; letter-spacing: 1px;">MOTOR GOOGLE ACTIVADO</div>
+            <div id="roleDisplay" style="margin-top: 12px; font-size: 11px; color: #444; font-weight: bold; letter-spacing: 1px;">MOTOR GOOGLE v2.0 (JSONP)</div>
         </div>
         
         <div class="main-view">
@@ -88,29 +88,27 @@
             
             <div class="info-panel">
                 <div id="dist">--m</div>
-                <div id="status">INICIANDO...</div>
+                <div id="status">PULSANDO GOOGLE...</div>
             </div>
         </div>
 
-        <!-- PANEL DE DIAGNÓSTICO (DIAG PANEL) -->
+        <!-- PANEL DE DIAGNÓSTICO -->
         <div id="diag-panel">
             <div class="diag-handle" onclick="toggleDiag()">DIAGNÓSTICO GOOGLE</div>
             <div class="diag-header">
-                <span>RAW LOGS: GOOGLE SCRIPT</span>
+                <span>BLACK BOX: GOOGLE CLOUD SYNC</span>
                 <span class="ping" id="last-ping">LATENCIA: --ms</span>
             </div>
-            <div id="log-console" class="diag-log">
-                [SYSTEM] Esperando conexión...
-            </div>
+            <div id="log-console" class="diag-log">[SYSTEM] Esperando conexión...</div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                <span style="font-size:10px; color:#666;">AMIGO-POINTER 2026 | BLACK BOX</span>
+                <span style="font-size:10px; color:#666;">AMIGO-POINTER 2026 | RADAR PRO</span>
                 <div class="exit-btn" onclick="location.reload()">CERRAR SESIÓN</div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🦅 CONFIG: GOOGLE APPS SCRIPT WEB APP URL
+        // 🦅 CONFIG: GOOGLE APPS SCRIPT WEB APP URL (JSONP EDITION)
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVo_2XXuldsiRyHDFKjyAbQNsoHuUBhyL4h3oAdEhi5xh9ZKYZHV3pylzBktPOUGwgmg/exec";
 
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
@@ -126,7 +124,7 @@
 
         function toggleDiag() { document.getElementById('diag-panel').classList.toggle('active'); }
 
-        // SENSORES
+        // --- MANEJO DE SENSORES ---
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientationabsolute', (e) => {
                 heading = e.alpha || e.webkitCompassHeading || 0;
@@ -135,35 +133,39 @@
 
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-            addLog(`GPS Localizado: ${myLoc.lat.toFixed(4)}, ${myLoc.lon.toFixed(4)}`, 'info');
-        }, (err) => addLog("Error GPS: " + err.message, 'error'), { enableHighAccuracy: true });
+        }, null, { enableHighAccuracy: true });
 
-        // MOTOR DE SINCRONIZACIÓN GOOGLE
-        async function syncWithGoogle() {
+        // --- MOTOR DE SINCRONIZACIÓN GOOGLE (JSONP ATÓMICO) ---
+        function syncWithGoogle() {
             if (!sessionId || !myLoc) return;
 
             const start = Date.now();
-            const data = { sala: sessionId, userId: myId, coords: myLoc };
-            addLog(`ENVIANDO A GOOGLE: ${JSON.stringify(data)}`, 'sync');
-
-            try {
-                // Nota: Usamos fetch con modo 'no-cors' para Google Apps Script
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(data)
-                });
-
+            const callbackName = "google_sync_" + Math.floor(Math.random() * 100000);
+            
+            // Creamos el script JSONP
+            const script = document.createElement("script");
+            script.src = `${GOOGLE_SCRIPT_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${callbackName}`;
+            
+            window[callbackName] = function(data) {
                 const latency = Date.now() - start;
                 document.getElementById('last-ping').innerText = `LATENCIA: ${latency}ms`;
-                addLog(`GOOGLE RESPONDIÓ (Código: ${response.status || 'OK'}) | Latencia: ${latency}ms`, 'info');
+                addLog(`GOOGLE OK: Lat ${myLoc.lat.toFixed(4)} | Latencia: ${latency}ms`, 'sync');
                 
-                // En modo no-cors no podemos leer el body, pero en un entorno real 
-                // configuraríamos GAS con JSONP o un proxy para recibir el friendLoc.
-                updateUI();
-            } catch (e) { 
-                addLog(`ERROR DE CONEXIÓN: ${e.message}`, 'error');
-            }
+                if (data && data.lat) {
+                    friendLoc = data;
+                    addLog(`AMIGO UBICADO: ${JSON.stringify(data)}`, 'info');
+                }
+                
+                delete window[callbackName];
+                document.body.removeChild(script);
+            };
+
+            script.onerror = () => {
+                addLog("ERROR DE CONEXIÓN CON GOOGLE", "error");
+                document.body.removeChild(script);
+            };
+
+            document.body.appendChild(script);
         }
 
         setInterval(syncWithGoogle, 3000);
@@ -171,15 +173,13 @@
         function createRoom() {
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
             myId = "u1";
-            addLog(`SALA CREADA: ${sessionId} (ROL: LÍDER)`, 'info');
             startSession();
         }
 
         function joinRoom() {
             sessionId = document.getElementById('roomCode').value;
-            if (sessionId.length < 4) return alert("Código inválido");
+            if (sessionId.length < 4) return;
             myId = "u2";
-            addLog(`UNIÉNDOSE A SALA: ${sessionId} (ROL: SEGUIDOR)`, 'info');
             startSession();
         }
 
@@ -193,8 +193,8 @@
             if (!myLoc || !friendLoc) return;
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
-            const arrowAngle = (bearing - heading + 360) % 360;
             
+            const arrowAngle = (bearing - heading + 360) % 360;
             document.getElementById('arrow').style.transform = `rotate(${arrowAngle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${arrowAngle}deg)`;
             
@@ -206,7 +206,7 @@
             document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
             const color = dist < 0.03 ? "#4285F4" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('status').innerText = dist < 0.03 ? "OBJETIVO FIJADO" : "PULSANDO SEÑAL...";
+            document.getElementById('status').innerText = dist < 0.03 ? "AMIGO A LA VISTA" : "PULSANDO RADAR...";
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
