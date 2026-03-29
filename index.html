@@ -3,132 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Electric Violet</title>
+    <title>Amigo-Pointer 2026 | High Precision</title>
     <style>
         :root { 
-            --accent: #00d2ff; /* Azul Neón */
-            --primary: #7000ff; /* Violeta Eléctrico */
-            --detail: #ff007f; /* Rosa Mínimo */
-            --bg: #050010; /* Espacio Profundo */
-            --text: #ffffff;
-            --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
+            --accent: #00d2ff; --primary: #7000ff; --detail: #ff007f; --bg: #050010; --text: #ffffff;
+            --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: var(--text);
-            overflow: hidden; 
-            font-family: 'Inter', sans-serif;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; font-family: 'Inter', sans-serif; }
 
-        /* --- PANTALLA DE INICIO --- */
-        #setup { 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            width: 100%; height: 100dvh; padding: 0 10%; text-align: center;
-            background: radial-gradient(circle at center, #1a0033 0%, #050010 100%);
-        }
+        /* --- UI PRINCIPAL --- */
+        #setup { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100dvh; padding: 0 10%; text-align: center; background: radial-gradient(circle at center, #1a0033 0%, #050010 100%); }
+        .btn { background: linear-gradient(45deg, var(--primary), var(--accent)); color: #fff; border: none; padding: 20px; border-radius: 18px; font-weight: 900; cursor: pointer; width: 100%; font-size: 15px; box-shadow: 0 10px 30px rgba(112,0,255,0.3); text-transform: uppercase; }
+        input { width: 100%; padding: 20px; margin: 25px 0 10px; border: 2px solid #1a1a1a; border-radius: 18px; font-size: 32px; text-align: center; background: #000; color: #fff; font-weight: 900; }
 
-        .hero-icon { font-size: 50px; color: var(--accent); text-shadow: 0 0 30px var(--primary); margin-bottom: 20px; }
-        h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin: 0; text-transform: uppercase; color: #fff; }
-        .sub-tag { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 4px; margin-top: 5px; }
-
-        .setup-card {
-            margin-top: 50px; width: 100%; max-width: 400px;
-        }
-
-        .btn { 
-            background: linear-gradient(45deg, var(--primary), var(--accent)); color: #fff; border: none; padding: 20px; border-radius: 18px; 
-            font-weight: 900; cursor: pointer; width: 100%; font-size: 15px; 
-            box-shadow: 0 10px 30px rgba(112,0,255,0.3); transition: 0.2s; text-transform: uppercase;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-join { background: transparent; border: 2px solid #222; color: #555; margin-top: 15px; box-shadow: none; }
-
-        input { 
-            width: 100%; padding: 20px; margin: 25px 0 10px; border: 2px solid #1a1a1a; border-radius: 18px; 
-            font-size: 32px; text-align: center; background: #000; color: #fff; font-weight: 900;
-        }
-
-        /* --- INTERFAZ APP --- */
         #app { display: none; flex-direction: column; width: 100%; height: 100dvh; position: relative; }
-
-        .top-nav {
-            padding: var(--safe-top) 20px 0; height: 80px; display: flex; 
-            justify-content: space-between; align-items: center; z-index: 100;
-        }
+        .top-nav { padding: var(--safe-top) 20px 0; height: 80px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .abort-btn { background: #200; border: 1px solid #400; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #f44; cursor: pointer; }
-        .id-badge { font-size: 13px; font-weight: 900; color: var(--accent); font-family: monospace; }
-
-        .view-container { flex: 1; position: relative; width: 100%; overflow: hidden; }
-        .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
-        .view.active { display: flex; }
-
-        /* RADAR VIEW */
-        #view-radar { align-items: center; justify-content: center; }
-        .radar-disc {
-            position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px);
-            border: 2px solid rgba(0, 210, 255, 0.1); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, #0a001a 0%, #000 100%);
-        }
-        .radar-disc::after { content: ''; position: absolute; width: 100%; height: 100%; border: 1px solid var(--primary); border-radius: 50%; opacity: 0.1; animation: pulse-ring 4s infinite linear; }
-        @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 0; } }
-
-        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.8s cubic-bezier(0.1, 0.5, 0.5, 1); }
+        
+        .radar-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .radar-disc { position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px); border: 2px solid rgba(0, 210, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #0a001a 0%, #000 100%); }
+        
+        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
         .friend-led { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff, 0 0 40px var(--detail); border: 4px solid var(--detail); }
-
-        .arrow-el { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 65px solid var(--accent); transition: transform 0.3s; filter: drop-shadow(0 0 15px var(--accent)); }
+        .arrow-el { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 65px solid var(--accent); transition: transform 0.1s linear; filter: drop-shadow(0 0 15px var(--accent)); }
         
         .metrics { text-align: center; margin-top: 40px; }
-        .m-val { font-size: 80px; font-weight: 900; margin: 0; line-height: 1; color: #fff; text-shadow: 0 0 30px var(--primary); font-family: monospace; }
+        .m-val { font-size: 80px; font-weight: 900; margin: 0; line-height: 1; text-shadow: 0 0 30px var(--primary); font-family: monospace; }
         .m-label { font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: 6px; opacity: 0.6; }
 
-        /* LOGS VIEW */
-        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ade80; background: #000; }
-        .raw-packet { background: #050010; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #1a0033; color: #00d2ff; white-space: pre-wrap; word-break: break-all; }
+        /* INDICADOR DE PRECISIÓN */
+        .acc-pill { position: fixed; top: 15px; right: 20px; font-size: 9px; font-weight: 900; background: #111; padding: 4px 12px; border-radius: 20px; color: #444; border: 1px solid #222; }
+        .acc-good { color: #00ff00 !important; border-color: #00ff0055; }
+        .acc-bad { color: #ffaa00 !important; border-color: #ffaa0055; }
 
-        /* BOTTOM NAV */
-        .nav-bar {
-            height: 75px; background: #080808; border-top: 1px solid #111; 
-            display: flex; padding-bottom: var(--safe-bottom);
-        }
+        /* BLACK BOX TABS */
+        .nav-bar { height: 75px; background: #080808; border-top: 1px solid #111; display: flex; padding-bottom: var(--safe-bottom); }
         .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; font-size: 9px; font-weight: 900; letter-spacing: 2px; }
         .nav-tab.active { color: var(--accent); }
-        .nav-tab .icon { font-size: 20px; margin-bottom: 4px; font-style: normal; }
-
-        .gps-light { position: fixed; top: 15px; right: 20px; font-size: 9px; font-weight: 900; color: #333; z-index: 200; }
-        .gps-active { color: #00ff00 !important; text-shadow: 0 0 10px #00ff00; }
+        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ade80; background: #000; display: none; }
+        .log-screen.active { display: block; }
+        .raw-packet { background: #050010; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #1a0033; color: #00d2ff; white-space: pre-wrap; word-break: break-all; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: SETUP -->
     <div id="setup">
-        <div class="hero-icon">⟁</div>
-        <h1>AMIGO FINDER</h1>
-        <div class="sub-tag">CYBER SYNC 2026</div>
-
+        <h1 style="color: #fff;">AMIGO FINDER ◎</h1>
+        <div style="color: var(--primary); font-size: 10px; letter-spacing: 5px; margin-top: 5px;">PRECISION ENGINE v10.0</div>
         <div class="setup-card">
             <button class="btn" onclick="createRoom()">NEW SESSION</button>
             <input type="number" id="roomCode" placeholder="0000" maxlength="4">
-            <button class="btn btn-join" onclick="joinRoom()">JOIN CONNECTION</button>
+            <button class="btn" style="background: transparent; border: 1px solid #333; color: #555; margin-top: 15px;" onclick="joinRoom()">JOIN CONNECTION</button>
         </div>
     </div>
 
-    <!-- SCREEN 2: MAIN -->
     <div id="app">
-        <div class="gps-light" id="gpsLed">GPS: OFF</div>
-
+        <div class="acc-pill" id="accPill">ACCURACY: --m</div>
         <header class="top-nav">
-            <div class="abort-btn" onclick="abort()">ABORT</div>
-            <div class="id-badge" id="idBadge">NET_ID: 0000</div>
+            <div class="abort-btn" onclick="if(confirm('¿Abortar?')) location.reload()">ABORT</div>
+            <div id="idBadge" style="font-family: monospace; font-weight: 900; color: #444;">NET_ID: 0000</div>
         </header>
 
-        <main class="view-container">
-            <section id="view-radar" class="view active">
+        <main class="view-container" style="flex: 1; display: flex; flex-direction: column;">
+            <section id="view-radar" class="radar-view active">
                 <div class="radar-disc">
                     <div class="orbit" id="orbit"><div class="friend-led"></div></div>
                     <div class="arrow-el" id="arrow"></div>
@@ -139,39 +77,33 @@
                 </div>
             </section>
 
-            <section id="view-logs" class="view">
-                <div class="log-screen" id="log-console">
-                    [SYSTEM] Deep Space Kernel Active...
-                </div>
+            <section id="view-logs" class="log-screen">
+                [SYSTEM] Precision Kernel Active. Awaiting data...
             </section>
         </main>
 
         <nav class="nav-bar">
-            <div class="nav-tab active" id="tab-radar" onclick="showTab('radar')">
-                <i class="icon">◎</i><span>RADAR</span>
-            </div>
-            <div class="nav-tab" id="tab-logs" onclick="showTab('logs')">
-                <i class="icon">▤</i><span>BLACK BOX</span>
-            </div>
+            <div class="nav-tab active" id="tab-radar" onclick="switchTab('radar')">◎ RADAR</div>
+            <div class="nav-tab" id="tab-logs" onclick="switchTab('logs')">▤ BLACK BOX</div>
         </nav>
     </div>
 
     <script>
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
-        let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
+        let sessionId = "", myId = "", myLoc = null, friendLoc = null;
+        let currentHeading = 0, filteredHeading = 0;
+        const EMA_ALPHA = 0.2; // Suavizado de brújula (0.1 = Muy suave, 0.9 = Rápido)
 
-        function showTab(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('view-' + id).classList.add('active');
-            document.getElementById('tab-' + id).classList.add('active');
+        function switchTab(id) {
+            document.getElementById('view-radar').classList.toggle('active', id === 'radar');
+            document.getElementById('view-logs').classList.toggle('active', id === 'logs');
+            document.getElementById('tab-radar').classList.toggle('active', id === 'radar');
+            document.getElementById('tab-logs').classList.toggle('active', id === 'logs');
         }
 
-        function abort() { if(confirm("¿Abortar conexión?")) location.reload(); }
-
-        // --- BLACK BOX LOGIC (PROTECTED) ---
+        // --- BLACK BOX (PROTECTED) ---
         function addLog(msg, raw = null) {
-            const console = document.getElementById('log-console');
+            const console = document.getElementById('view-logs');
             const time = new Date().toLocaleTimeString();
             let html = `<div style="margin-bottom:15px; border-bottom: 1px solid #111; padding-bottom: 10px;">[${time}] ${msg}`;
             if (raw) html += `<div class="raw-packet">${JSON.stringify(raw, null, 2)}</div>`;
@@ -180,19 +112,33 @@
             console.scrollTop = console.scrollHeight;
         }
 
+        // --- GPS CON MONITOR DE PRECISIÓN ---
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-            document.getElementById('gpsLed').innerText = "GPS: ACTIVE";
-            document.getElementById('gpsLed').classList.add('gps-active');
-            if(!sessionId) addLog("SIGNAL_LOCK_OK", myLoc);
-        }, (err) => addLog("SIGNAL_ERR: " + err.message), { enableHighAccuracy: true });
+            const acc = pos.coords.accuracy;
+            const pill = document.getElementById('accPill');
+            pill.innerText = `ACCURACY: ${acc.toFixed(0)}m`;
+            pill.className = `acc-pill ${acc < 15 ? 'acc-good' : 'acc-bad'}`;
+            if(!sessionId) addLog("GPS_LINK_ESTABLISHED", {lat: myLoc.lat, lon: myLoc.lon, acc: acc});
+        }, (err) => addLog("GPS_ERROR: " + err.message), { enableHighAccuracy: true });
 
+        // --- BRÚJULA CON FILTRO EMA ---
         window.addEventListener('deviceorientationabsolute', (e) => {
-            heading = e.alpha || e.webkitCompassHeading || 0;
-            if(sessionId && friendLoc) updateUI();
+            let heading = e.alpha || e.webkitCompassHeading || 0;
+            
+            // Corrección de cruce 0/360 para el filtro
+            let diff = heading - filteredHeading;
+            if (diff > 180) diff -= 360;
+            if (diff < -180) diff += 360;
+            
+            filteredHeading += EMA_ALPHA * diff;
+            currentHeading = (filteredHeading + 360) % 360;
+            
+            updateUI();
         }, true);
 
-        function sync() {
+        // --- SYNC ENGINE ---
+        async function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
             const url = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
@@ -210,34 +156,23 @@
             };
             document.body.appendChild(script);
         }
-
         setInterval(sync, 4000);
 
-        function createRoom() {
-            sessionId = Math.floor(1000 + Math.random() * 9000).toString();
-            myId = "u1"; launch();
-        }
-
-        function joinRoom() {
-            const code = document.getElementById('roomCode').value;
-            if (code.length < 4) return;
-            sessionId = code; myId = "u2"; launch();
-        }
-
-        function launch() {
-            document.getElementById('setup').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            document.getElementById('idBadge').innerText = "NET_ID: " + sessionId;
-            addLog(`VIRTUAL_SESS: ${sessionId} | NODE: ${myId}`);
-        }
+        function createRoom() { sessionId = Math.floor(1000 + Math.random() * 9000).toString(); myId = "u1"; launch(); }
+        function joinRoom() { const code = document.getElementById('roomCode').value; if (code.length < 4) return; sessionId = code; myId = "u2"; launch(); }
+        function launch() { document.getElementById('setup').style.display = 'none'; document.getElementById('app').style.display = 'flex'; document.getElementById('idBadge').innerText = "NET_ID: " + sessionId; addLog(`SESSION_INIT: ${sessionId}`); }
 
         function updateUI() {
             if (!myLoc || !friendLoc) return;
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
-            const angle = (bearing - heading + 360) % 360;
+            
+            // Dirección final = Rumbo al amigo - Mi orientación actual
+            const angle = (bearing - currentHeading + 360) % 360;
+            
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
+            
             if (dist < 1) {
                 document.getElementById('dist').innerText = (dist * 1000).toFixed(0);
                 document.getElementById('unit').innerText = "METERS";
