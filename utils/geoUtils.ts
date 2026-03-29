@@ -1,5 +1,5 @@
 /**
- * 🦅 AMIGO-POINTER 2026 | GeoUtils
+ *  AMIGO-POINTER 2026 | GeoUtils
  * Cálculos matemáticos para navegación GPS y brújula.
  */
 
