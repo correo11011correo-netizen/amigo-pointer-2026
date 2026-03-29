@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | App Premium</title>
+    <title>Amigo-Pointer 2026 | Tactical Precision</title>
     <style>
         :root { 
             --accent: #4285F4; 
@@ -23,106 +23,114 @@
             font-family: 'Inter', -apple-system, sans-serif;
         }
 
-        /* --- PANTALLA DE INICIO (REDISEÑADA) --- */
+        /* --- LOGO TÁCTICO (Retícula en lugar de Águila) --- */
+        .reticle {
+            width: 40px; height: 40px; border: 2px solid var(--accent); border-radius: 50%;
+            position: relative; margin-bottom: 20px;
+        }
+        .reticle::before, .reticle::after {
+            content: ''; position: absolute; background: var(--accent);
+        }
+        .reticle::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+        .reticle::after { width: 2px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+
+        /* --- PANTALLA DE INICIO --- */
         #setup { 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             width: 100%; height: 100dvh; padding: 0 10%; text-align: center;
         }
 
-        .logo-area { margin-bottom: 50px; }
-        .logo-area h1 { font-size: 36px; font-weight: 900; letter-spacing: -2px; margin: 0; }
-        .logo-area p { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: 5px; margin: 5px 0 0; }
+        .logo-area { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
+        .logo-area h1 { font-size: 30px; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+        .logo-area p { color: #555; font-size: 10px; font-weight: 800; letter-spacing: 6px; margin: 5px 0 0; text-transform: uppercase; }
 
         .setup-card {
-            background: #0a0a0a; border: 1px solid #1a1a1a; padding: 40px 30px; border-radius: 30px;
-            width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: #080808; border: 1px solid #111; padding: 40px 30px; border-radius: 24px;
+            width: 100%; max-width: 400px;
         }
 
-        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 20px; font-weight: 900; cursor: pointer; width: 100%; font-size: 16px; transition: 0.2s; }
-        .btn:active { transform: scale(0.96); }
-        .btn-link { background: transparent; border: 1px solid #333; color: #fff; margin-top: 15px; }
+        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-link { background: transparent; border: 1px solid #222; color: #666; margin-top: 15px; font-size: 12px; }
 
         .code-input-box { margin: 30px 0; position: relative; }
-        .code-input-box input { width: 100%; padding: 20px; border: 2px solid #222; border-radius: 20px; font-size: 32px; text-align: center; background: #000; color: #fff; font-weight: 900; font-family: monospace; letter-spacing: 5px; }
-        .code-input-box label { position: absolute; top: -10px; left: 20px; background: #0a0a0a; padding: 0 10px; font-size: 10px; font-weight: 800; color: #444; }
+        .code-input-box input { width: 100%; padding: 20px; border: 1px solid #222; border-radius: 12px; font-size: 36px; text-align: center; background: #000; color: #fff; font-weight: 900; font-family: monospace; letter-spacing: 8px; }
+        .code-input-box label { position: absolute; top: -8px; left: 15px; background: #080808; padding: 0 10px; font-size: 9px; font-weight: 800; color: #444; letter-spacing: 2px; }
 
         /* --- INTERFAZ APP --- */
         #app { display: none; flex-direction: column; width: 100%; height: 100dvh; position: relative; }
 
-        /* TOP NAV */
         .top-nav {
-            padding: var(--safe-top) 20px 0; height: 100px; display: flex; 
+            padding: var(--safe-top) 20px 0; height: 80px; display: flex; 
             justify-content: space-between; align-items: center; z-index: 100;
         }
-        .back-btn { background: #111; border: 1px solid #222; padding: 10px 18px; border-radius: 12px; font-size: 11px; font-weight: 900; color: #f44; cursor: pointer; }
-        .room-info { background: #111; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 900; font-family: monospace; color: var(--accent); }
+        .back-btn { background: #111; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; color: #f44; cursor: pointer; border: 1px solid #200; }
+        .room-info { font-size: 12px; font-weight: 900; font-family: monospace; color: #444; letter-spacing: 2px; }
 
-        /* VIEWS */
         .view-container { flex: 1; position: relative; width: 100%; overflow: hidden; }
         .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
         .view.active { display: flex; }
 
-        /* RADAR VIEW */
-        #view-radar { align-items: center; justify-content: center; background: radial-gradient(circle, #0d0d0d 0%, #000 100%); }
+        #view-radar { align-items: center; justify-content: center; background: #000; }
         .radar-shell {
             position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px);
-            border: 2px solid rgba(66, 133, 244, 0.1); border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
-        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.4s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        .friend-dot { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 25px var(--accent); border: 4px solid #fff; }
-        .arrow-v { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 60px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 15px var(--accent)); }
-        .metrics { text-align: center; margin-top: 35px; }
-        .metrics h2 { font-size: 80px; font-weight: 900; margin: 0; line-height: 0.8; letter-spacing: -5px; }
-        .metrics span { font-size: 13px; font-weight: 900; color: #444; letter-spacing: 5px; text-transform: uppercase; }
+        .radar-shell::before { content: ''; position: absolute; width: 100%; height: 100%; border: 1px solid rgba(66, 133, 244, 0.1); border-radius: 50%; animation: pulse 4s infinite linear; }
+        @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 0; } }
 
-        /* LOGS VIEW */
-        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0f0; background: #000; line-height: 1.6; }
-        .raw-data-box { background: #080808; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #111; color: #4285F4; white-space: pre-wrap; word-break: break-all; }
+        .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s cubic-bezier(0.1, 0.5, 0.5, 1); }
+        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); border: 2px solid #fff; }
+        .arrow-v { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.3s cubic-bezier(0.1, 0.5, 0.5, 1); filter: drop-shadow(0 0 10px var(--accent)); }
+        
+        .metrics { text-align: center; margin-top: 40px; }
+        .metrics h2 { font-size: 70px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; font-family: monospace; }
+        .metrics span { font-size: 11px; font-weight: 900; color: #333; letter-spacing: 4px; text-transform: uppercase; }
 
-        /* BOTTOM NAV */
+        .log-screen { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #0f0; background: #000; }
+        .raw-data-box { background: #050505; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #111; color: #4285F4; white-space: pre-wrap; word-break: break-all; }
+
         .bottom-tabs {
-            height: 75px; background: #050505; border-top: 1px solid #1a1a1a; 
+            height: 70px; background: #050505; border-top: 1px solid #111; 
             display: flex; padding-bottom: var(--safe-bottom);
         }
-        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; font-size: 9px; font-weight: 900; letter-spacing: 2px; }
         .tab-btn.active { color: var(--accent); }
-        .tab-btn i { font-size: 20px; margin-bottom: 4px; font-style: normal; }
+        .tab-btn span.icon { font-size: 18px; margin-bottom: 4px; }
 
-        .gps-status { position: fixed; top: 15px; right: 20px; font-size: 9px; font-weight: 900; background: #111; padding: 4px 10px; border-radius: 20px; color: #444; z-index: 200; border: 1px solid #222; }
-        .gps-on { color: #4ade80 !important; border-color: #4ade8055; }
+        .gps-status { position: fixed; top: 15px; right: 20px; font-size: 8px; font-weight: 900; color: #222; z-index: 200; letter-spacing: 1px; }
+        .gps-on { color: #4ade80 !important; }
     </style>
 </head>
 <body>
 
-    <!-- SCREEN 1: SETUP -->
     <div id="setup">
         <div class="logo-area">
-            <h1>RADAR POINTER</h1>
-            <p>TACTICAL SYNC 2026</p>
+            <div class="reticle"></div>
+            <h1>PRECISION POINTER</h1>
+            <p>TACTICAL LOCATOR 2026</p>
         </div>
 
         <div class="setup-card">
-            <button class="btn" onclick="createRoom()">CREAR NUEVA SALA</button>
+            <button class="btn" onclick="createRoom()">GENERATE SESSION</button>
             <div class="code-input-box">
-                <label>VINCULAR AMIGO</label>
+                <label>VINCULAR LINK</label>
                 <input type="number" id="roomCode" placeholder="0000" maxlength="4">
             </div>
-            <button class="btn btn-link" onclick="joinRoom()">CONECTAR AHORA</button>
+            <button class="btn btn-link" onclick="joinRoom()">ESTABLISH CONNECTION</button>
         </div>
     </div>
 
-    <!-- SCREEN 2: MAIN APP -->
     <div id="app">
-        <div class="gps-status" id="gpsState">🛰️ GPS: SEARCHING</div>
+        <div class="gps-status" id="gpsState">SIGNAL: SEARCHING</div>
 
         <header class="top-nav">
-            <div class="back-btn" onclick="exitSession()">← VOLVER</div>
-            <div class="room-info" id="roomDisplay">ROOM: 0000</div>
+            <div class="back-btn" onclick="exitSession()">ABORT SESSION</div>
+            <div class="room-info" id="roomDisplay">NET_ID: 0000</div>
         </header>
 
         <main class="view-container">
-            <!-- VISTA: RADAR -->
             <section id="view-radar" class="view active">
                 <div class="radar-shell">
                     <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
@@ -130,24 +138,23 @@
                 </div>
                 <div class="metrics">
                     <h2 id="dist">--</h2>
-                    <span id="unit">Buscando...</span>
+                    <span id="unit">Waiting for fix...</span>
                 </div>
             </section>
 
-            <!-- VISTA: LOGS -->
             <section id="view-logs" class="view">
                 <div class="log-screen" id="log-console">
-                    [SYSTEM] Cargando registros de tráfico crudo...
+                    [SYSTEM] Precision Kernel Active. Awaiting data...
                 </div>
             </section>
         </main>
 
         <nav class="bottom-tabs">
             <div class="tab-btn active" id="tab-radar" onclick="showTab('radar')">
-                <i>🛰️</i><span>RADAR</span>
+                <span class="icon">◎</span><span>RADAR</span>
             </div>
             <div class="tab-btn" id="tab-logs" onclick="showTab('logs')">
-                <i>📊</i><span>BLACK BOX</span>
+                <span class="icon">▤</span><span>BLACK BOX</span>
             </div>
         </nav>
     </div>
@@ -156,7 +163,6 @@
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
-        // --- NAVEGACIÓN ---
         function showTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -164,13 +170,9 @@
             document.getElementById('tab-' + id).classList.add('active');
         }
 
-        function exitSession() {
-            if(confirm("¿Deseas cerrar la sesión táctica?")) {
-                location.reload();
-            }
-        }
+        function exitSession() { if(confirm("¿Abortar conexión táctica?")) location.reload(); }
 
-        // --- LÓGICA DE DIAGNÓSTICO (BLOQUEADA/PROTEGIDA) ---
+        // --- BLACK BOX ENGINE (UNTOUCHED LOGIC) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
             const time = new Date().toLocaleTimeString();
@@ -181,33 +183,27 @@
             console.scrollTop = console.scrollHeight;
         }
 
-        // GPS
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-            document.getElementById('gpsState').innerText = "🛰️ GPS: ACTIVE";
+            document.getElementById('gpsState').innerText = "SIGNAL: ACTIVE";
             document.getElementById('gpsState').classList.add('gps-on');
-            if(!sessionId) addLog("GPS_LINK_ESTABLISHED", myLoc);
-        }, (err) => {
-            addLog("GPS_LINK_ERROR: " + err.message);
-        }, { enableHighAccuracy: true });
+            if(!sessionId) addLog("SIGNAL_LOCKED", myLoc);
+        }, (err) => addLog("SIGNAL_ERROR: " + err.message), { enableHighAccuracy: true });
 
-        // SENSORES
         window.addEventListener('deviceorientationabsolute', (e) => {
             heading = e.alpha || e.webkitCompassHeading || 0;
             if(sessionId && friendLoc) updateUI();
         }, true);
 
-        // SYNC ENGINE
         function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
             const url = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
-            addLog("OUTGOING_PULSE", { sala: sessionId, lat: myLoc.lat, lon: myLoc.lon });
-
+            addLog("PULSE_OUT", { sala: sessionId, lat: myLoc.lat, lon: myLoc.lon });
             const script = document.createElement("script");
             script.src = url;
             window[cb] = function(res) {
-                addLog("INCOMING_RAW_DATA", res);
+                addLog("PULSE_IN", res);
                 if (res.status === "DEBUG_OK" && res.friend_data) {
                     friendLoc = res.friend_data;
                     updateUI();
@@ -222,23 +218,20 @@
 
         function createRoom() {
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
-            myId = "u1";
-            launchApp();
+            myId = "u1"; launch();
         }
 
         function joinRoom() {
             const code = document.getElementById('roomCode').value;
             if (code.length < 4) return;
-            sessionId = code;
-            myId = "u2";
-            launchApp();
+            sessionId = code; myId = "u2"; launch();
         }
 
-        function launchApp() {
+        function launch() {
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('roomDisplay').innerText = "ROOM: " + sessionId;
-            addLog(`SESSION_STARTED: ${sessionId} | ID: ${myId}`);
+            document.getElementById('roomDisplay').innerText = "NET_ID: " + sessionId;
+            addLog(`HANDSHAKE_INIT: ${sessionId} | NODE: ${myId}`);
         }
 
         function updateUI() {
@@ -246,18 +239,15 @@
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const angle = (bearing - heading + 360) % 360;
-            
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
-            
             if (dist < 1) {
                 document.getElementById('dist').innerText = (dist * 1000).toFixed(0);
-                document.getElementById('unit').innerText = "METROS";
+                document.getElementById('unit').innerText = "METERS";
             } else {
                 document.getElementById('dist').innerText = dist.toFixed(2);
-                document.getElementById('unit').innerText = "KILÓMETROS";
+                document.getElementById('unit').innerText = "KILOMETERS";
             }
-            
             const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
             document.documentElement.style.setProperty('--accent', color);
         }
