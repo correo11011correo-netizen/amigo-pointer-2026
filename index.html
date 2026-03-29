@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Tactical Tactical</title>
+    <title>Amigo-Pointer 2026 | Tactical Tab</title>
     <style>
         :root { 
             --accent: #4285F4; 
@@ -17,79 +17,86 @@
         
         body { 
             font-family: 'Inter', -apple-system, sans-serif; 
-            background: var(--bg); 
-            color: var(--text);
-            margin: 0; display: flex; flex-direction: column; align-items: center; 
-            height: 100dvh; overflow: hidden; 
+            background: var(--bg); color: var(--text);
+            margin: 0; height: 100dvh; overflow: hidden; 
         }
 
-        /* --- PANTALLA DE INICIO --- */
+        /* --- SETUP --- */
         #setup { 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             width: 100%; max-width: 450px; padding: 0 10%; height: 100%; text-align: center;
         }
-        h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin-bottom: 30px; }
         .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 16px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; margin: 10px 0; }
         input { width: 100%; padding: 20px; margin: 10px 0; border: 1px solid #333; border-radius: 16px; font-size: 24px; text-align: center; background: #111; color: #fff; font-weight: 900; }
 
-        /* --- RADAR APP (DISEÑO MEJORADO) --- */
-        #app { display: none; flex-direction: column; width: 100%; height: 100%; }
+        /* --- RADAR APP (FULL SCREEN) --- */
+        #app { display: none; flex-direction: column; width: 100%; height: 100%; position: relative; }
 
         .radar-view { 
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            position: relative; background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
+            background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
+            padding-bottom: 60px; /* Espacio para la pestaña */
         }
 
         .radar-frame {
-            position: relative; width: clamp(260px, 70vmin, 380px); height: clamp(260px, 70vmin, 380px);
+            position: relative; width: clamp(280px, 85vmin, 420px); height: clamp(280px, 85vmin, 420px);
             border: 1px solid rgba(66, 133, 244, 0.2); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
-        
         .radar-frame::before { content: ''; position: absolute; width: 66%; height: 66%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
         .radar-frame::after { content: ''; position: absolute; width: 33%; height: 33%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
 
         .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.4s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); border: 3px solid #fff; }
+        .friend-dot { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 25px var(--accent); border: 4px solid #fff; }
 
-        .arrow { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 10px var(--accent)); }
+        .arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 70px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 15px var(--accent)); }
 
-        .dist-box { text-align: center; margin-top: 20px; }
-        .dist-val { font-size: 60px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
-        .dist-label { font-size: 12px; letter-spacing: 3px; color: #555; font-weight: 800; }
+        .dist-box { text-align: center; margin-top: 30px; z-index: 5; }
+        .dist-val { font-size: clamp(60px, 18vw, 100px); font-weight: 900; line-height: 1; letter-spacing: -4px; }
+        .dist-label { font-size: 14px; letter-spacing: 5px; color: #555; font-weight: 800; text-transform: uppercase; }
 
-        /* INDICADOR GPS VISUAL */
-        .gps-status-indicator {
-            position: absolute; top: var(--safe-top); right: 20px;
-            font-size: 10px; font-weight: 900; letter-spacing: 1px; color: #444;
-        }
+        .gps-status { position: absolute; top: var(--safe-top); right: 20px; font-size: 10px; font-weight: 900; color: #444; letter-spacing: 1px; }
         .gps-active { color: #4ade80 !important; text-shadow: 0 0 10px #4ade80; }
 
-        /* --- [ZONA PROTEGIDA: SISTEMA DE DIAGNÓSTICO] --- */
+        /* --- [ZONA PROTEGIDA: BLACK BOX EN PESTAÑA] --- */
         #black-box { 
-            height: 35%; width: 100%; background: #080808; border-top: 2px solid #222; 
-            display: flex; flex-direction: column; overflow: hidden;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; 
+            background: rgba(5, 5, 5, 0.98); border-top: 3px solid var(--accent); 
+            display: flex; flex-direction: column; z-index: 1000;
+            transform: translateY(calc(75vh - 50px)); /* Solo asoma la cabecera */
+            transition: transform 0.4s cubic-bezier(0.1, 0.5, 0.5, 1);
+            backdrop-filter: blur(20px);
         }
-        .bb-header { background: #111; padding: 8px 15px; font-size: 10px; font-weight: bold; color: #666; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
-        .log-area { flex: 1; overflow-y: auto; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #0f0; line-height: 1.4; }
-        .raw-packet { background: #000; padding: 10px; margin: 8px 0; border: 1px solid #1a1a1a; color: #4285F4; white-space: pre-wrap; word-break: break-all; border-radius: 6px; }
-        .exit-btn { color: #f44; font-weight: 900; font-size: 10px; cursor: pointer; border: 1px solid #f44; padding: 2px 8px; border-radius: 4px; }
+        #black-box.open { transform: translateY(0); }
+
+        .bb-handle { 
+            height: 50px; width: 100%; background: #111; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer;
+            font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #666;
+        }
+        .bb-handle::before { content: ''; width: 40px; height: 4px; background: #333; border-radius: 2px; position: absolute; top: 8px; }
+
+        .log-area { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0f0; line-height: 1.5; }
+        .raw-packet { background: #000; padding: 12px; margin: 10px 0; border: 1px solid #1a1a1a; color: #4285F4; white-space: pre-wrap; word-break: break-all; border-radius: 8px; }
+        .footer-tools { padding: 15px 20px var(--safe-bottom); border-top: 1px solid #222; display: flex; gap: 10px; }
+        .exit-btn { background: #300; color: #f44; border: 1px solid #f44; padding: 12px; border-radius: 10px; font-weight: 800; flex: 1; font-size: 12px; cursor: pointer; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="setup">
-        <h1 id="main-title">RADAR POINTER<br><span style="color:var(--accent); font-size: 14px; letter-spacing: 4px;">SYSTEM 2026</span></h1>
+        <h1 style="margin-bottom: 10px;">RADAR POINTER</h1>
+        <div style="color:var(--accent); font-size: 12px; font-weight: 900; letter-spacing: 5px; margin-bottom: 40px;">ATOMIC SYNC 2026</div>
         <button class="btn" onclick="createRoom()">CREAR NUEVA SALA</button>
-        <input type="number" id="roomCode" placeholder="CÓDIGO">
-        <button class="btn" style="background: #222; color: #fff;" onclick="joinRoom()">UNIRSE A SALA</button>
+        <input type="number" id="roomCode" placeholder="0000" maxlength="4">
+        <button class="btn" style="background: #222; color: #fff;" onclick="joinRoom()">UNIRSE A AMIGO</button>
     </div>
 
     <div id="app">
-        <div class="gps-status-indicator" id="gpsVisual">🛰️ GPS: OFF</div>
+        <div class="gps-status" id="gpsVisual">🛰️ GPS: OFF</div>
 
         <div class="radar-view">
-            <div style="position: absolute; top: var(--safe-top); left: 20px; font-weight: 900; opacity: 0.3; letter-spacing: 2px; font-size: 12px;" id="roomDisplay">SALA: ----</div>
+            <div style="position: absolute; top: var(--safe-top); left: 20px; font-weight: 900; opacity: 0.2; letter-spacing: 2px; font-size: 12px;" id="roomDisplay">SALA: ----</div>
             
             <div class="radar-frame">
                 <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
@@ -98,17 +105,19 @@
 
             <div class="dist-box">
                 <div class="dist-val" id="dist">--</div>
-                <div class="dist-label" id="unit">VINCULANDO...</div>
+                <div class="dist-label" id="unit">BUSCANDO AMIGO...</div>
             </div>
         </div>
 
+        <!-- [SISTEMA DE DIAGNÓSTICO EN PESTAÑA - LÓGICA PROTEGIDA] -->
         <div id="black-box">
-            <div class="bb-header">
-                <span>RAW TRAFFIC MONITOR (BLACK BOX)</span>
-                <span class="exit-btn" onclick="location.reload()">SALIR</span>
-            </div>
+            <div class="bb-handle" onclick="toggleLogs()">DIAGNOSTIC LOGS</div>
             <div class="log-area" id="log-console">
                 [SYSTEM] Inicializando Kernel de Sincronización...
+            </div>
+            <div class="footer-tools">
+                <div class="exit-btn" onclick="location.reload()">TERMINAR SESIÓN</div>
+                <button class="btn" style="flex:1; margin:0; font-size: 12px;" onclick="toggleLogs()">CERRAR PANEL</button>
             </div>
         </div>
     </div>
@@ -117,6 +126,9 @@
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
+        function toggleLogs() { document.getElementById('black-box').classList.toggle('open'); }
+
+        // --- FUNCIÓN DE LOGS (LÓGICA BLOQUEADA/PROTEGIDA) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
             const time = new Date().toLocaleTimeString();
@@ -127,6 +139,7 @@
             console.scrollTop = console.scrollHeight;
         }
 
+        // GPS
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
             document.getElementById('gpsVisual').innerText = "🛰️ GPS: ACTIVE";
@@ -137,11 +150,13 @@
             addLog("GPS_ERROR", err.message);
         }, { enableHighAccuracy: true });
 
+        // SENSORES
         window.addEventListener('deviceorientationabsolute', (e) => {
             heading = e.alpha || e.webkitCompassHeading || 0;
             if(sessionId && friendLoc) updateUI();
         }, true);
 
+        // MOTOR SYNC
         function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
@@ -192,6 +207,7 @@
             const angle = (bearing - heading + 360) % 360;
             document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
             document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
+            
             if (dist < 1) {
                 document.getElementById('dist').innerText = (dist * 1000).toFixed(0);
                 document.getElementById('unit').innerText = "METROS";
@@ -199,6 +215,7 @@
                 document.getElementById('dist').innerText = dist.toFixed(2);
                 document.getElementById('unit').innerText = "KILÓMETROS";
             }
+            
             const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
             document.documentElement.style.setProperty('--accent', color);
         }
