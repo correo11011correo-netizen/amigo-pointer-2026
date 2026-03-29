@@ -3,132 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Tactical Tab</title>
+    <title>Amigo-Pointer 2026 | App Native Pro</title>
     <style>
         :root { 
             --accent: #4285F4; 
             --bg: #000000; 
+            --nav-bg: #0a0a0a;
             --text: #ffffff;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
             background: var(--bg); color: var(--text);
-            margin: 0; height: 100dvh; overflow: hidden; 
+            overflow: hidden; /* BLOQUEO DE SCROLL DEL NAVEGADOR */
+            font-family: 'Inter', -apple-system, sans-serif;
         }
 
-        /* --- SETUP --- */
+        /* --- PANTALLA DE INICIO (ESTADO FIJO) --- */
         #setup { 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            width: 100%; max-width: 450px; padding: 0 10%; height: 100%; text-align: center;
+            width: 100%; height: 100dvh; padding: 0 10%; text-align: center;
         }
-        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 16px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; margin: 10px 0; }
+        h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin-bottom: 30px; }
+        .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 16px; font-weight: 800; cursor: pointer; width: 100%; font-size: 16px; }
         input { width: 100%; padding: 20px; margin: 10px 0; border: 1px solid #333; border-radius: 16px; font-size: 24px; text-align: center; background: #111; color: #fff; font-weight: 900; }
 
-        /* --- RADAR APP (FULL SCREEN) --- */
-        #app { display: none; flex-direction: column; width: 100%; height: 100%; position: relative; }
-
-        .radar-view { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
-            padding-bottom: 60px; /* Espacio para la pestaña */
+        /* --- ESTRUCTURA DE APP NATIVA --- */
+        #app { 
+            display: none; flex-direction: column; width: 100%; height: 100dvh; 
+            position: relative; padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
         }
 
+        /* VISTAS INTERNAS */
+        .view-container { flex: 1; position: relative; width: 100%; overflow: hidden; }
+        .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
+        .view.active { display: flex; }
+
+        /* VISTA: RADAR */
+        #view-radar { align-items: center; justify-content: center; background: radial-gradient(circle, #0d0d0d 0%, #000 100%); }
         .radar-frame {
-            position: relative; width: clamp(280px, 85vmin, 420px); height: clamp(280px, 85vmin, 420px);
-            border: 1px solid rgba(66, 133, 244, 0.2); border-radius: 50%;
+            position: relative; width: clamp(280px, 80vmin, 400px); height: clamp(280px, 80vmin, 400px);
+            border: 2px solid rgba(66, 133, 244, 0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
-        .radar-frame::before { content: ''; position: absolute; width: 66%; height: 66%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
-        .radar-frame::after { content: ''; position: absolute; width: 33%; height: 33%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; }
-
         .orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.4s cubic-bezier(0.1, 0.5, 0.5, 1); }
-        .friend-dot { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 25px var(--accent); border: 4px solid #fff; }
+        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 22px; height: 22px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); border: 3px solid #fff; }
+        .arrow { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 50px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 10px var(--accent)); }
+        .dist-box { text-align: center; margin-top: 30px; }
+        .dist-val { font-size: 70px; font-weight: 900; line-height: 1; letter-spacing: -3px; }
+        .dist-label { font-size: 12px; letter-spacing: 5px; color: #555; font-weight: 800; text-transform: uppercase; }
 
-        .arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 70px solid var(--accent); transition: transform 0.2s; filter: drop-shadow(0 0 15px var(--accent)); }
-
-        .dist-box { text-align: center; margin-top: 30px; z-index: 5; }
-        .dist-val { font-size: clamp(60px, 18vw, 100px); font-weight: 900; line-height: 1; letter-spacing: -4px; }
-        .dist-label { font-size: 14px; letter-spacing: 5px; color: #555; font-weight: 800; text-transform: uppercase; }
-
-        .gps-status { position: absolute; top: var(--safe-top); right: 20px; font-size: 10px; font-weight: 900; color: #444; letter-spacing: 1px; }
-        .gps-active { color: #4ade80 !important; text-shadow: 0 0 10px #4ade80; }
-
-        /* --- [ZONA PROTEGIDA: BLACK BOX EN PESTAÑA] --- */
-        #black-box { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; 
-            background: rgba(5, 5, 5, 0.98); border-top: 3px solid var(--accent); 
-            display: flex; flex-direction: column; z-index: 1000;
-            transform: translateY(calc(75vh - 50px)); /* Solo asoma la cabecera */
-            transition: transform 0.4s cubic-bezier(0.1, 0.5, 0.5, 1);
-            backdrop-filter: blur(20px);
-        }
-        #black-box.open { transform: translateY(0); }
-
-        .bb-handle { 
-            height: 50px; width: 100%; background: #111; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer;
-            font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #666;
-        }
-        .bb-handle::before { content: ''; width: 40px; height: 4px; background: #333; border-radius: 2px; position: absolute; top: 8px; }
-
+        /* VISTA: LOGS (BLACK BOX) */
+        #view-logs { background: #000; }
+        .log-header { padding: 15px 20px; background: #0a0a0a; border-bottom: 1px solid #222; font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #555; display: flex; justify-content: space-between; }
         .log-area { flex: 1; overflow-y: auto; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0f0; line-height: 1.5; }
-        .raw-packet { background: #000; padding: 12px; margin: 10px 0; border: 1px solid #1a1a1a; color: #4285F4; white-space: pre-wrap; word-break: break-all; border-radius: 8px; }
-        .footer-tools { padding: 15px 20px var(--safe-bottom); border-top: 1px solid #222; display: flex; gap: 10px; }
-        .exit-btn { background: #300; color: #f44; border: 1px solid #f44; padding: 12px; border-radius: 10px; font-weight: 800; flex: 1; font-size: 12px; cursor: pointer; text-align: center; }
+        .raw-packet { background: #080808; padding: 12px; margin: 10px 0; border: 1px solid #1a1a1a; color: #4285F4; white-space: pre-wrap; word-break: break-all; border-radius: 8px; }
+
+        /* BARRA DE NAVEGACIÓN INFERIOR (APP TABS) */
+        .bottom-nav {
+            height: 70px; width: 100%; background: var(--nav-bg); 
+            border-top: 1px solid #222; display: flex; align-items: center; 
+            padding: 0 10px;
+        }
+        .nav-item { 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100%; color: #444; cursor: pointer; transition: all 0.2s;
+        }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        .nav-label { font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+
+        .gps-pill { position: absolute; top: 15px; right: 20px; padding: 4px 10px; border-radius: 20px; background: #111; font-size: 9px; font-weight: 900; color: #444; border: 1px solid #222; z-index: 100; }
+        .gps-active { color: #4ade80 !important; border-color: #4ade8055; }
     </style>
 </head>
 <body>
 
+    <!-- SCREEN 1: SETUP -->
     <div id="setup">
-        <h1 style="margin-bottom: 10px;">RADAR POINTER</h1>
-        <div style="color:var(--accent); font-size: 12px; font-weight: 900; letter-spacing: 5px; margin-bottom: 40px;">ATOMIC SYNC 2026</div>
+        <h1 style="margin-bottom: 5px;">RADAR POINTER</h1>
+        <div style="color:var(--accent); font-size: 11px; font-weight: 900; letter-spacing: 4px; margin-bottom: 40px;">NATIVE ENGINE 2026</div>
         <button class="btn" onclick="createRoom()">CREAR NUEVA SALA</button>
+        <div style="margin: 25px 0; font-size: 10px; color: #333; font-weight: bold;">O VINCULAR DISPOSITIVO</div>
         <input type="number" id="roomCode" placeholder="0000" maxlength="4">
-        <button class="btn" style="background: #222; color: #fff;" onclick="joinRoom()">UNIRSE A AMIGO</button>
+        <button class="btn" style="background: #222; color: #fff;" onclick="joinRoom()">UNIRSE A SALA</button>
     </div>
 
+    <!-- SCREEN 2: NATIVE APP INTERFACE -->
     <div id="app">
-        <div class="gps-status" id="gpsVisual">🛰️ GPS: OFF</div>
+        <div class="gps-pill" id="gpsVisual">🛰️ GPS: OFF</div>
 
-        <div class="radar-view">
-            <div style="position: absolute; top: var(--safe-top); left: 20px; font-weight: 900; opacity: 0.2; letter-spacing: 2px; font-size: 12px;" id="roomDisplay">SALA: ----</div>
-            
-            <div class="radar-frame">
-                <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
-                <div class="arrow" id="arrow"></div>
+        <!-- CONTENEDOR DE VISTAS -->
+        <div class="view-container">
+            <!-- SECCIÓN: RADAR -->
+            <div id="view-radar" class="view active">
+                <div style="position: absolute; top: 15px; left: 20px; font-size: 11px; font-weight: 900; opacity: 0.3;" id="roomDisplay">SALA: ----</div>
+                <div class="radar-frame">
+                    <div class="orbit" id="orbit"><div class="friend-dot"></div></div>
+                    <div class="arrow" id="arrow"></div>
+                </div>
+                <div class="dist-box">
+                    <div class="dist-val" id="dist">--</div>
+                    <div class="dist-label" id="unit">BUSCANDO...</div>
+                </div>
             </div>
 
-            <div class="dist-box">
-                <div class="dist-val" id="dist">--</div>
-                <div class="dist-label" id="unit">BUSCANDO AMIGO...</div>
+            <!-- SECCIÓN: LOGS (BLACK BOX) -->
+            <div id="view-logs" class="view">
+                <div class="log-header">
+                    <span>RAW TRAFFIC MONITOR (BLACK BOX)</span>
+                    <span style="color: #f44; cursor: pointer;" onclick="location.reload()">TERMINAR</span>
+                </div>
+                <div class="log-area" id="log-console">
+                    [SYSTEM] Kernel iniciado. Seleccione Radar para comenzar.
+                </div>
             </div>
         </div>
 
-        <!-- [SISTEMA DE DIAGNÓSTICO EN PESTAÑA - LÓGICA PROTEGIDA] -->
-        <div id="black-box">
-            <div class="bb-handle" onclick="toggleLogs()">DIAGNOSTIC LOGS</div>
-            <div class="log-area" id="log-console">
-                [SYSTEM] Inicializando Kernel de Sincronización...
+        <!-- BOTTOM NAV BAR -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" id="nav-radar" onclick="switchView('radar')">
+                <div class="nav-icon">🛰️</div>
+                <div class="nav-label">RADAR</div>
             </div>
-            <div class="footer-tools">
-                <div class="exit-btn" onclick="location.reload()">TERMINAR SESIÓN</div>
-                <button class="btn" style="flex:1; margin:0; font-size: 12px;" onclick="toggleLogs()">CERRAR PANEL</button>
+            <div class="nav-item" id="nav-logs" onclick="switchView('logs')">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">DIAGNOSTIC</div>
             </div>
-        </div>
+        </nav>
     </div>
 
     <script>
         const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzpbZICE4tLFTlwTQxSyVe_2q3H7SW5qHG74MUymTA1-qs_4UNnDCyvPcIxoVsK9prGUg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
 
-        function toggleLogs() { document.getElementById('black-box').classList.toggle('open'); }
+        // --- NAVEGACIÓN ENTRE VISTAS ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('view-' + viewId).classList.add('active');
+            document.getElementById('nav-' + viewId).classList.add('active');
+        }
 
-        // --- FUNCIÓN DE LOGS (LÓGICA BLOQUEADA/PROTEGIDA) ---
+        // --- FUNCIÓN DE LOGS (LÓGICA PROTEGIDA) ---
         function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
             const time = new Date().toLocaleTimeString();
@@ -147,7 +169,7 @@
             if(!sessionId) addLog("GPS_FIX_ESTABLISHED", myLoc);
         }, (err) => {
             document.getElementById('gpsVisual').innerText = "🛰️ GPS: ERROR";
-            addLog("GPS_ERROR", err.message);
+            addLog("GPS_ERROR: " + err.message);
         }, { enableHighAccuracy: true });
 
         // SENSORES
@@ -156,7 +178,7 @@
             if(sessionId && friendLoc) updateUI();
         }, true);
 
-        // MOTOR SYNC
+        // MOTOR SYNC (JSONP)
         function sync() {
             if (!sessionId || !myLoc) return;
             const cb = "cb_" + Date.now();
