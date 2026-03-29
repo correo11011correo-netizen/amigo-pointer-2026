@@ -3,210 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Amigo-Pointer 2026 | Radar Pro</title>
+    <title>Amigo-Pointer 2026 | Black Box Edition</title>
     <style>
         :root { 
-            --accent: #4285F4; 
-            --bg: #0a0a0a; 
-            --text: #ffffff;
+            --accent: #4285F4; --bg: #0a0a0a; --text: #ffffff;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
-            --pulse-scale: 1;
         }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg); 
-            color: var(--text);
-            margin: 0; display: flex; flex-direction: column; align-items: center; 
-            height: 100dvh; overflow: hidden; 
-        }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; height: 100dvh; overflow: hidden; }
 
-        /* --- UI PRINCIPAL --- */
         #setup { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 500px; padding: 40px 10%; height: 100%; }
         .btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%; font-size: 18px; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
         input { width: 100%; padding: 20px; margin: 15px 0; border: 3px solid #333; border-radius: 18px; font-size: 26px; text-align: center; background: #1a1a1a; font-weight: 900; color: #fff; }
 
         #app { display: none; flex-direction: column; width: 100%; height: 100%; padding: var(--safe-top) 20px var(--safe-bottom); }
-
         .header { width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
         .room-tag { background: var(--accent); color: #fff; padding: 10px 25px; border-radius: 30px; font-size: 20px; font-weight: 900; }
         
         .main-view { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
-
         .radar-box { position: relative; width: clamp(260px, 75vmin, 420px); height: clamp(260px, 75vmin, 420px); display: flex; align-items: center; justify-content: center; }
-        .proximity-halo { position: absolute; width: 100%; height: 100%; border: 2px solid var(--accent); border-radius: 50%; opacity: 0.3; transform: scale(var(--pulse-scale)); transition: transform 0.2s ease-out; box-shadow: 0 0 30px var(--accent); }
+        .proximity-halo { position: absolute; width: 100%; height: 100%; border: 2px solid var(--accent); border-radius: 50%; opacity: 0.3; transform: scale(1); transition: transform 0.2s; box-shadow: 0 0 30px var(--accent); }
         .compass-outer { position: relative; width: 85%; height: 85%; border: 4px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); z-index: 2; }
-        .friend-orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.5s linear; }
-        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); }
+        .friend-orbit { position: absolute; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.3s ease-out; }
+        .friend-dot { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 22px; height: 22px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 20px var(--accent); border: 3px solid white; }
         #arrow { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 60px solid var(--accent); transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); filter: drop-shadow(0 0 10px var(--accent)); }
         
-        #dist { font-size: clamp(50px, 15vw, 85px); font-weight: 900; line-height: 1; margin: 10px 0; }
+        #dist { font-size: clamp(50px, 15vw, 85px); font-weight: 900; margin: 10px 0; }
         #status { font-size: 14px; color: #666; letter-spacing: 4px; font-weight: 800; }
         
-        /* --- PANEL DE DIAGNÓSTICO --- */
-        #diag-panel { 
-            position: fixed; bottom: -80vh; left: 0; width: 100%; height: 80vh; 
-            background: #111; border-top: 4px solid var(--accent); 
-            z-index: 100; transition: bottom 0.4s cubic-bezier(0.1, 0.5, 0.5, 1);
-            display: flex; flex-direction: column; padding: 20px; color: #0f0; font-family: 'Courier New', Courier, monospace;
-        }
+        /* --- BLACK BOX DIAGNOSTIC --- */
+        #diag-panel { position: fixed; bottom: -85vh; left: 0; width: 100%; height: 85vh; background: #000; border-top: 4px solid var(--accent); z-index: 100; transition: bottom 0.4s ease-in-out; display: flex; flex-direction: column; }
         #diag-panel.active { bottom: 0; }
-        .diag-handle { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 15px 15px 0 0; font-weight: 900; font-size: 12px; cursor: pointer; }
-        .diag-log { flex: 1; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; border-radius: 10px; font-size: 11px; margin-top: 10px; }
-        .diag-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .ping { color: #4285F4; }
-
-        .exit-btn { color: #ff4444; font-weight: 800; font-size: 12px; padding: 10px 20px; border-radius: 10px; border: 2px solid #ff4444; cursor: pointer; }
+        .diag-handle { position: absolute; top: -45px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 12px 25px; border-radius: 20px 20px 0 0; font-weight: 900; font-size: 13px; cursor: pointer; }
+        .log-area { flex: 1; overflow-y: auto; padding: 20px; font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; line-height: 1.4; color: #0f0; }
+        .raw-box { background: #111; border: 1px solid #333; padding: 10px; margin-top: 5px; color: #4285F4; white-space: pre-wrap; word-break: break-all; border-radius: 8px; }
+        .exit-btn { color: #ff4444; font-weight: 800; padding: 15px; text-align: center; border: 2px solid #ff4444; margin: 20px; border-radius: 12px; }
     </style>
 </head>
 <body>
 
     <div id="setup">
-        <h1 style="color: #fff;">🦅 RADAR-POINTER</h1>
-        <div style="color: #666; letter-spacing: 3px; margin-bottom: 50px;">GOOGLE ATOMIC RADAR 2026</div>
-        <button class="btn" onclick="createRoom()">CREAR RADAR</button>
-        <div style="width:100%; display: flex; align-items: center; margin: 30px 0;"><div style="flex:1; height:1px; background:#333;"></div><span style="padding: 0 15px; color:#444;">O</span><div style="flex:1; height:1px; background:#333;"></div></div>
-        <input type="number" id="roomCode" placeholder="CÓDIGO RADAR">
-        <button class="btn" style="background: #333; color: #fff; box-shadow: none;" onclick="joinRoom()">UNIRSE</button>
+        <h1>🦅 RADAR-POINTER</h1>
+        <div style="color: #666; letter-spacing: 2px; margin-bottom: 40px;">SINCRO GOOGLE | BLACK BOX</div>
+        <button class="btn" onclick="createRoom()">CREAR SALA</button>
+        <div style="margin: 30px 0; color:#444;">O</div>
+        <input type="number" id="roomCode" placeholder="CÓDIGO AMIGO">
+        <button class="btn" style="background: #333; color: #fff;" onclick="joinRoom()">UNIRSE</button>
     </div>
 
     <div id="app">
         <div class="header">
             <span class="room-tag" id="roomDisplay">SALA: ----</span>
-            <div id="roleDisplay" style="margin-top: 12px; font-size: 11px; color: #444; font-weight: bold; letter-spacing: 1px;">MOTOR GOOGLE v2.0 (JSONP)</div>
         </div>
-        
         <div class="main-view">
             <div class="radar-box">
                 <div class="proximity-halo" id="halo"></div>
                 <div class="friend-orbit" id="orbit"><div class="friend-dot"></div></div>
                 <div class="compass-outer"><div id="arrow"></div></div>
             </div>
-            
             <div class="info-panel">
                 <div id="dist">--m</div>
-                <div id="status">PULSANDO GOOGLE...</div>
+                <div id="status">BUSCANDO SEÑAL...</div>
             </div>
         </div>
-
-        <!-- PANEL DE DIAGNÓSTICO -->
         <div id="diag-panel">
-            <div class="diag-handle" onclick="toggleDiag()">DIAGNÓSTICO GOOGLE</div>
-            <div class="diag-header">
-                <span>BLACK BOX: GOOGLE CLOUD SYNC</span>
-                <span class="ping" id="last-ping">LATENCIA: --ms</span>
+            <div class="diag-handle" onclick="toggleDiag()">DIAGNÓSTICO BLACK BOX</div>
+            <div class="log-area" id="log-console">
+                [SYSTEM] Motor iniciado. Esperando conexión...
             </div>
-            <div id="log-console" class="diag-log">[SYSTEM] Esperando conexión...</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                <span style="font-size:10px; color:#666;">AMIGO-POINTER 2026 | RADAR PRO</span>
-                <div class="exit-btn" onclick="location.reload()">CERRAR SESIÓN</div>
-            </div>
+            <div class="exit-btn" onclick="location.reload()">TERMINAR Y SALIR</div>
         </div>
     </div>
 
     <script>
-        // 🦅 CONFIG: GOOGLE APPS SCRIPT WEB APP URL (JSONP EDITION)
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVo_2XXuldsiRyHDFKjyAbQNsoHuUBhyL4h3oAdEhi5xh9ZKYZHV3pylzBktPOUGwgmg/exec";
-
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxVo_2XXuldsiRyHDFKjyAbQNsoHuUBhyL4h3oAdEhi5xh9ZKYZHV3pylzBktPOUGwgmg/exec";
         let sessionId = "", myId = "", myLoc = null, friendLoc = null, heading = 0;
-        let pulseTimer = 0;
 
-        function addLog(msg, type = 'info') {
+        function addLog(msg, raw = null) {
             const console = document.getElementById('log-console');
-            const color = type === 'error' ? '#f00' : (type === 'sync' ? '#4285F4' : '#0f0');
             const time = new Date().toLocaleTimeString();
-            console.innerHTML += `<div style="color:${color}">[${time}] ${msg}</div>`;
+            let html = `<div style="margin-bottom:10px;">[${time}] ${msg}`;
+            if (raw) html += `<div class="raw-box">${JSON.stringify(raw, null, 2)}</div>`;
+            html += `</div>`;
+            console.innerHTML += html;
             console.scrollTop = console.scrollHeight;
         }
 
         function toggleDiag() { document.getElementById('diag-panel').classList.toggle('active'); }
 
-        // --- MANEJO DE SENSORES ---
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientationabsolute', (e) => {
-                heading = e.alpha || e.webkitCompassHeading || 0;
-            }, true);
-        }
+        // SENSORES
+        window.addEventListener('deviceorientationabsolute', (e) => {
+            heading = e.alpha || e.webkitCompassHeading || 0;
+            if(sessionId) updateUI();
+        }, true);
 
         navigator.geolocation.watchPosition((pos) => {
             myLoc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+            if (sessionId) sync();
         }, null, { enableHighAccuracy: true });
 
-        // --- MOTOR DE SINCRONIZACIÓN GOOGLE (JSONP ATÓMICO) ---
-        function syncWithGoogle() {
+        // MOTOR BLACK BOX (JSONP)
+        function sync() {
             if (!sessionId || !myLoc) return;
-
-            const start = Date.now();
-            const callbackName = "google_sync_" + Math.floor(Math.random() * 100000);
-            
-            // Creamos el script JSONP
+            const cb = "cb_" + Math.floor(Math.random() * 100000);
             const script = document.createElement("script");
-            script.src = `${GOOGLE_SCRIPT_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${callbackName}`;
+            script.src = `${GOOGLE_URL}?sala=${sessionId}&userId=${myId}&lat=${myLoc.lat}&lon=${myLoc.lon}&callback=${cb}`;
             
-            window[callbackName] = function(data) {
-                const latency = Date.now() - start;
-                document.getElementById('last-ping').innerText = `LATENCIA: ${latency}ms`;
-                addLog(`GOOGLE OK: Lat ${myLoc.lat.toFixed(4)} | Latencia: ${latency}ms`, 'sync');
-                
-                if (data && data.lat) {
-                    friendLoc = data;
-                    addLog(`AMIGO UBICADO: ${JSON.stringify(data)}`, 'info');
+            window[cb] = function(rawResponse) {
+                addLog("--- [RAW LOG: GOOGLE_RESPONSE] ---", rawResponse);
+                if (rawResponse.status === "OK") {
+                    if (rawResponse.friend_data) {
+                        friendLoc = rawResponse.friend_data;
+                        updateUI();
+                    }
                 }
-                
-                delete window[callbackName];
+                delete window[cb];
                 document.body.removeChild(script);
             };
-
-            script.onerror = () => {
-                addLog("ERROR DE CONEXIÓN CON GOOGLE", "error");
-                document.body.removeChild(script);
-            };
-
             document.body.appendChild(script);
         }
 
-        setInterval(syncWithGoogle, 3000);
+        setInterval(sync, 4000);
 
         function createRoom() {
             sessionId = Math.floor(1000 + Math.random() * 9000).toString();
             myId = "u1";
-            startSession();
+            start();
         }
 
         function joinRoom() {
             sessionId = document.getElementById('roomCode').value;
             if (sessionId.length < 4) return;
             myId = "u2";
-            startSession();
+            start();
         }
 
-        function startSession() {
+        function start() {
             document.getElementById('setup').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('roomDisplay').innerText = "RADAR: " + sessionId;
+            document.getElementById('roomDisplay').innerText = "SALA: " + sessionId;
+            addLog(`SALA INICIADA: ${sessionId} | TU ID: ${myId}`);
         }
 
         function updateUI() {
             if (!myLoc || !friendLoc) return;
             const dist = getDistance(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
             const bearing = getBearing(myLoc.lat, myLoc.lon, friendLoc.lat, friendLoc.lon);
+            const angle = (bearing - heading + 360) % 360;
             
-            const arrowAngle = (bearing - heading + 360) % 360;
-            document.getElementById('arrow').style.transform = `rotate(${arrowAngle}deg)`;
-            document.getElementById('orbit').style.transform = `rotate(${arrowAngle}deg)`;
-            
-            const pulseRate = dist < 0.02 ? 0.5 : (dist < 0.2 ? 1.5 : 3);
-            pulseTimer += 0.1;
-            const scale = 1.0 + (Math.sin(pulseTimer / pulseRate) * (dist < 0.05 ? 0.2 : 0.05));
-            document.documentElement.style.setProperty('--pulse-scale', scale);
+            document.getElementById('arrow').style.transform = `rotate(${angle}deg)`;
+            document.getElementById('orbit').style.transform = `rotate(${angle}deg)`;
             
             document.getElementById('dist').innerText = dist < 1 ? (dist * 1000).toFixed(0) + "m" : dist.toFixed(2) + "km";
-            const color = dist < 0.03 ? "#4285F4" : (dist < 0.3 ? "#FBBC05" : "#EA4335");
+            const color = dist < 0.03 ? "#4ade80" : (dist < 0.3 ? "#facc15" : "#f87171");
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('status').innerText = dist < 0.03 ? "AMIGO A LA VISTA" : "PULSANDO RADAR...";
+            document.getElementById('status').innerText = dist < 0.03 ? "¡OBJETIVO EN RANGO!" : "SIGUIENDO RASTRO...";
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
@@ -220,12 +172,6 @@
             const y = Math.sin(dl) * Math.cos(l2), x = Math.cos(l1) * Math.sin(l2) - Math.sin(l1) * Math.cos(l2) * Math.cos(dl);
             return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
         }
-
-        function animate() {
-            if (sessionId) updateUI();
-            requestAnimationFrame(animate);
-        }
-        animate();
     </script>
 </body>
 </html>
