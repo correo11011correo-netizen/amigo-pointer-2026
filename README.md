@@ -1,4 +1,4 @@
-# 🦅 AMIGO-POINTER 2026
+#  AMIGO-POINTER 2026
 ## Brújula GPS de Amigos en Tiempo Real
 
 Esta es una aplicación híbrida (Web/Mobile) construida con **Expo** y **Firebase** que permite a dos usuarios encontrarse en el mundo real mediante una brújula que apunta directamente al otro.
