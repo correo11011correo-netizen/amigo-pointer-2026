@@ -1,4 +1,4 @@
-# 🦅 AMIGO-POINTER 2026 | MANUAL TÉCNICO
+#  AMIGO-POINTER 2026 | MANUAL TÉCNICO
 
 ## 🎯 PROPÓSITO
 Sistema de localización táctica en tiempo real diseñado para encontrar amigos en entornos dinámicos (fiestas, festivales, exteriores) mediante una brújula de alta precisión.
