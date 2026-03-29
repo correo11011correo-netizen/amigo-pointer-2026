@@ -1,36 +1,36 @@
 /**
- * 🦅 AMIGO-POINTER 2026 | GOOGLE SERVER (Code.gs)
- * Este script actúa como el "puente" entre los dos teléfonos.
+ * 🦅 AMIGO-POINTER 2026 | GOOGLE SERVER v2.0 (JSONP)
+ * Motor optimizado para evitar errores de CORS y Latencia.
  */
 
 var cache = CacheService.getScriptCache();
 
-function doPost(e) {
+function doGet(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
-    var sala = data.sala;
-    var userId = data.userId;
-    var myCoords = JSON.stringify(data.coords);
+    var sala = e.parameter.sala;
+    var userId = e.parameter.userId;
+    var lat = e.parameter.lat;
+    var lon = e.parameter.lon;
+    var callback = e.parameter.callback; // Para JSONP
+
+    if (sala && userId && lat && lon) {
+      // 1. Guardar mi posición
+      var myCoords = JSON.stringify({lat: lat, lon: lon});
+      cache.put(sala + "_" + userId, myCoords, 600);
+      
+      // 2. Obtener posición del amigo
+      var friendId = (userId === "u1") ? "u2" : "u1";
+      var friendCoords = cache.get(sala + "_" + friendId) || "null";
+      
+      // 3. Responder en formato JSONP para saltar el CORS
+      var output = callback + "(" + friendCoords + ")";
+      return ContentService.createTextOutput(output)
+                           .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
     
-    // 1. Guardamos mi posición en la memoria de Google (durante 10 minutos)
-    // Usamos el ID de la sala y el ID de usuario como clave
-    cache.put(sala + "_" + userId, myCoords, 600);
-    
-    // 2. Buscamos la posición del amigo
-    var friendId = (userId === "u1") ? "u2" : "u1";
-    var friendCoords = cache.get(sala + "_" + friendId);
-    
-    // 3. Respondemos con la posición del amigo (o null si no está)
-    return ContentService.createTextOutput(friendCoords || "null")
-                         .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput("Radar Google Activo 🦅");
     
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({error: err.toString()}))
-                         .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput("Error: " + err.toString());
   }
-}
-
-// Función para limpiar la sala manualmente si es necesario
-function doGet(e) {
-  return ContentService.createTextOutput("Servidor de Brújula Google Activo 🦅");
 }
