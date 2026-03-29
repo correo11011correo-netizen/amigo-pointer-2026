@@ -1,5 +1,5 @@
 /**
- * 🦅 AMIGO-POINTER 2026 | GOOGLE SERVER v4.0 (TRANS-CORS)
+ *  AMIGO-POINTER 2026 | GOOGLE SERVER v4.0 (TRANS-CORS)
  */
 
 var cache = CacheService.getScriptCache();
