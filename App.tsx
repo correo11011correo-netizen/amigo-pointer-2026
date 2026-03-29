@@ -58,7 +58,7 @@ export default function App() {
     if (!sessionId) {
         return (
             <SafeAreaView style={styles.container}>
-                <Text style={styles.title}>🦅 AMIGO-POINTER</Text>
+                <Text style={styles.title}> AMIGO-POINTER</Text>
                 <Text style={styles.subtitle}>2026 EDITION</Text>
                 
                 <TouchableOpacity style={styles.button} onPress={createSession}>
